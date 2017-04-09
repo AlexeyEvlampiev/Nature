@@ -1,0 +1,471 @@
+! Kinetic mechanism for Scheme ÅA (2006)
+
+! Coda Zabetta, E.; Hupa, M. A Detailed Kinetic Mechanism with Methanol for 
+! Simulating Biomass Combustion and N-Pollutants. 
+! Submitted to international scientific journal, 2006.
+
+! Downloaded from http://www.abo.fi/student/en/Content/Document/document/19064
+
+! Units are moles, cal/mole.
+
+
+ELEMENTS
+O H C N AR
+END
+
+
+SPECIES
+  NH3  N2O  NO2  NO
+  H  O  OH  H2  O2  HO2  H2O  H2O2
+  CO CO2
+  N NH NH2 NNH N2H2 N2H3 N2H4
+  HNO HONO NO3 H2NO N2
+  CN HCN HOCN NCN C2N2 HNNO HNCO NCO
+  CH2O HCO
+  CH4 CH3 CH3O CH2OH
+  C2H6 C2H5 C2H4 C2H3 CH2CO C2H2 HCCO C2H CH2* CH2 CH C
+  C4H2 C3H3 C3H2
+  H2CN HCNO
+  CH3OH HCOH
+  AR
+END
+
+
+REACTIONS
+
+NH3+M = NH2+H+M             2.2E16   0   93470
+NH3+H = NH2+H2              6.4E05  2.39 10171
+NH3+O = NH2+OH              9.4E06  1.94  6460
+NH3+OH = NH2+H2O            2.0E06  2.04   566
+NH3+HO2 = NH2+H2O2          3.0E11   0   22000
+
+NH2+H = NH+H2               4.0E13   0    3650
+NH2+O = HNO+H               6.6E14 -0.5      0
+NH2+O = NH+OH               6.8E12   0       0
+NH2+OH = NH+H2O             4.0E06  2.0   1000
+NH2+HO2 = H2NO+OH           5.0E13   0       0
+NH2+HO2 = NH3+O2            1.0E13   0       0
+H2NO+O = NH2+O2             2.0E14   0       0
+NH2+NH2= N2H2+H2            8.5E11   0       0
+NH2+NH2= NH3+NH             5.0E13   0   10000
+NH2+NH2(+M)=N2H4(+M)        1.5E13   0       0
+   LOW/1.0E18 0 0/
+   N2/2.5/  H2O/5/ NH3/10/
+NH2+NH = N2H2+H             5.0E13   0       0
+NH2+N  = N2+2H              7.0E13   0       0
+NH2+NO = NNH+OH             8.9E12 -0.35     0
+NH2+NO = N2+H2O             1.3E16 -1.25     0
+DUP
+NH2+NO = N2+H2O            -8.9E12 -0.35     0
+DUP
+NH2+NO2 = N2O+H2O           3.2E18 -2.2      0
+NH2+NO2 = H2NO+NO           3.5E12   0       0
+
+NH+H = N+H2                 3.0E13   0       0
+NH+O = NO+H                 9.2E13   0       0
+NH+OH = HNO+H               2.0E13   0       0
+NH+OH = N+H2O               5.0E11  0.5   2000
+NH+O2 = HNO+O               4.6E05  2.0   6500
+NH+O2 = NO+OH               1.3E06  1.5    100
+NH+N = N2+H                 3.0E13   0       0
+NH+NH = N2+2H               2.5E13   0       0
+NH+NO = N2O+H               2.9E14 -0.4      0
+DUP
+NH+NO = N2O+H              -2.2E13 -0.23     0
+DUP
+NH+NO = N2+OH               2.2E13 -0.23     0
+NH+NO2 = N2O+OH             1.0E13   0       0
+N+OH = NO+H                 3.8E13   0       0
+N+O2 = NO+O                 6.4E09  1.0   6280
+N+NO = N2+O                 3.3E12  0.3      0
+
+NO+O+M = NO2+M              7.5E19 -1.41     0
+    N2/1.7/  O2/1.5/  H2O/10/
+NO+OH+M = HONO+M            5.0E23 -2.51 -68
+    N2/1.0/  H2O/5.0/
+NO+HO2 = NO2+OH             2.1E12   0    -480
+
+NO2+H = NO+OH               8.4E13   0       0
+NO2+O = NO+O2               3.9E12   0    -238
+NO2+O(+M) = NO3(+M)         1.3E13  0.00     0
+    LOW/1.0E28 -4.08 2470/
+  N2/1.5/ O2/1.5/ H2O/18.6/
+NO2+NO2 = NO+NO+O2          1.6E12   0   26123
+NO2+NO2 = NO3+NO            9.6E09  0.73 20900
+
+HNO+M = H+NO+M              1.5E16   0   48680
+    H2O/10/ O2/2/ N2/2/ H2/2/
+HNO+H = NO+H2               4.4E11  0.72   650
+HNO+O = NO+OH               1.0E13   0       0
+HNO+OH = NO+H2O             3.6E13   0       0
+HNO+O2 = NO+HO2             1.0E13   0   25000
+HNO+NH2= NO+NH3             2.0E13   0    1000
+HNO+NO = N2O+OH             2.0E12   0   26000
+HNO+NO2 = HONO+NO           6.0E11  0.00  2000
+HNO+HNO = N2O+H2O           4.0E12   0    5000
+HONO+H = NO2+H2             1.2E13  0.0   7350
+HONO+O = NO2+OH             1.2E13  0.0   6000
+HONO+OH = NO2+H2O           4.0E12   0       0
+HONO+NH = NH2+NO2           1.0E13   0       0
+HONO+NH2 = NH3+NO2          5.0E12   0       0
+HONO+HONO=NO+NO2+H2O        2.3E12   0    8400
+H2NO+M = HNO+H+M            2.5E16   0   50000
+H2NO+H = HNO+H2             3.0E07  2.0   2000
+H2NO+H = NH2+OH             5.0E13   0       0
+H2NO+O = HNO+OH             3.0E07  2.0   2000
+H2NO+OH = HNO+H2O           2.0E07  2.0   1000
+H2NO+NO = HNO+HNO           2.0E07  2.0  13000
+H2NO+NH2 = HNO+NH3          3.0E12   0    1000
+H2NO+NO2 = HONO+HNO         6.0E11  0.00  2000
+NO3+H = NO2+OH              6.0E13  0.0      0
+NO3+O = NO2+O2              1.0E13  0.0      0
+NO3+OH = NO2+HO2            1.4E13  0.0      0
+NO3+HO2 = NO2+O2+OH         1.5E12  0.0      0
+NO3+NO2 = NO+NO2+O2         5.0E10  0.00  2940
+
+N2H4+H = N2H3+H2            1.3E13   0    2500
+N2H4+O = N2H2+H2O           8.5E13   0    1200
+N2H4+OH = N2H3+H2O          4.0E13   0       0
+N2H4+NH2 = N2H3+NH3         3.9E12   0    1500
+N2H3+M = N2H2+H+M           3.5E16   0   46000
+N2H3+H = NH2+NH2            1.6E12   0       0
+N2H3+O = N2H2+OH            5.0E12   0    5000
+N2H3+O = NH2+HNO            1.0E13   0       0
+N2H3+OH = N2H2+H2O          1.0E13   0    1000
+N2H3+OH = NH3+HNO           1.0E12   0   15000
+N2H3+NH = N2H2+NH2          2.0E13   0       0
+N2H2+M = NNH+H+M            5.0E16   0   50000
+    H2O/15.0/  H2/2.0/  N2/2.0/  O2/2.0/
+N2H2+H = NNH+H2             5.0E13   0    1000
+N2H2+O = NH2+NO             1.0E13   0    1000
+N2H2+O = NNH+OH             2.0E13   0    1000
+N2H2+OH = NNH+H2O           1.0E13   0    1000
+N2H2+NH = NNH+NH2           1.0E13   0    1000
+N2H2+NH2= NNH+NH3           1.0E13   0    1000
+N2H2+NO = N2O+NH2           3.0E12   0       0
+NNH = N2+H                  1.0E07   0       0
+NNH+H = N2+H2               1.0E14   0       0
+NNH+O = N2O+H               1.0E14   0       0
+NNH+O = NH+NO               5.0E13   0       0
+NNH+OH = N2+H2O             5.0E13   0       0
+NNH+O2 = N2+HO2             2.0E14   0       0
+NNH+O2 = N2+H+O2            5.0E13   0       0
+NNH+NH  = N2+NH2            5.0E13   0       0
+NNH+NH2 = N2+NH3            5.0E13   0       0
+NNH+NO = N2+HNO             5.0E13   0       0
+
+N2O+M = N2+O+M              4.0E14   0   56100
+    N2/1.7/ O2/1.4/ CO2/3.0/ H2O/12/   !
+N2O+H = N2+OH               3.3E10   0    4729
+DUP
+N2O+H = N2+OH               4.4E14   0   19254
+DUP
+N2O+O = NO+NO               2.9E13   0   23150
+N2O+O = N2+O2               1.4E12   0   10800
+N2O+OH = N2+HO2             2.0E12   0   40000
+
+O+OH = H+O2                 2.0E14 -0.40     0
+O+H2 = OH+H                 5.1E04  2.67  6290
+OH+H2 = H2O+H               2.1E08  1.52  3450
+OH+OH = H2O+O               4.3E03  2.70 -2486
+H+OH+M = H2O+M              8.4E21 -2.00     0
+    N2/2.6/ H2O/16.5/
+O+O+M = O2+M                1.9E13   0   -1788
+    N2/1.5/
+H+H+M = H2+M                1.0E18 -1.0      0
+    H2/0.0/ H2O/0/
+H+H+H2 = H2+H2              9.2E16 -0.6      0
+H+H+H2O = H2+H2O            6.0E19 -1.25     0
+H+O+M = OH+M                6.2E16 -0.6      0
+    N2/1.5/
+H+O2+M = HO2+M              2.1E18 -1.0      0
+    N2/0/ O2/1.5/ H2O/10.0/
+H+O2+N2 = HO2+N2            6.7E19 -1.42     0
+HO2+H = H2+O2               4.3E13   0    1411
+HO2+H = OH+OH               1.7E14   0     875
+HO2+H = O+H2O               3.0E13   0    1721
+HO2+O = OH+O2               3.3E13   0       0
+HO2+OH = H2O+O2             2.9E13   0    -497
+HO2+HO2 = H2O2+O2           1.3E11   0   -1630
+  DUP
+HO2+HO2 = H2O2+O2           4.2E14   0   11980
+  DUP
+H2O2+M = OH+OH+M            1.3E17   0   45500
+    N2/1.5/ O2/1.5/ H2O/10/
+H2O2+H = H2O+OH             1.0E13   0    3576
+H2O2+H = HO2+H2             1.7E12   0    3755
+H2O2+O = HO2+OH             6.6E11   0    3974
+H2O2+OH = H2O+HO2           7.8E12   0    1330
+  DUP
+H2O2+OH = H2O+HO2           5.8E14   0    9560
+  DUP
+
+CO+O+M = CO2+M             6.2E14   0    3000
+    N2/1.5/ O2/1.5/ H2O/16/
+CO+OH = CO2+H               1.4E05   1.95    -1347
+CO+HO2 = CO2+OH           6.0E13   0    22950
+CO+O2 = CO2+O                 2.5E12   0    47700
+
+CN+H2 = HCN+H                3.6E08     1.55     3000
+HCN+O = NCO+H                1.4E04     2.64     4980
+HCN+O = CN+OH                2.7E09     1.58    29200
+HCN+O = NH+CO                3.5E03     2.64     4980
+CN+H2O = HCN+OH              8.0E12      0       7450
+HCN+OH = HOCN+H              5.9E04     2.4     12500
+HCN+OH = HNCO+H              2.0E-03    4.0      1000
+HCN+OH = NH2+CO              7.8E-04    4.0      4000
+HCN+CN = C2N2+H              1.5E07     1.71      153
+C2N2+O = CN+NCO              4.6E12      0       8880
+C2N2+OH = CN+HOCN            1.9E11      0       2900
+NCN+H = HCN+N                1.0E14      0          0
+NCN+O = CN+NO                1.0E14      0          0
+NCN+OH = HCN+NO              5.0E13      0          0
+NCN+O2 = NO+NCO              1.0E13      0          0
+CN+O = CO+N                  7.7E13      0          0
+CN+OH = NCO+H                6.0E13      0          0
+CN+O2 = NCO+O                7.5E12      0       -389
+CN+CO2 = NCO+CO              3.7E06     2.16    26900
+CN+NO = NCO+N                1.0E14      0      42100
+CN+NO2 = NCO+NO              2.4E13      0       -370
+CN+HNO = HCN+NO              1.8E13      0          0
+CN+HONO = HCN+NO2            1.2E13      0          0
+CN+N2O = NCN+NO              3.8E03     2.6      3700
+HOCN+H = HNCO+H              2.0E07     2.0      2000
+HOCN+OH = NCO+H2O            6.4E05     2.0      2560
+HOCN+O = NCO+OH              1.5E04     2.64     4000
+HNCO+M = CO+NH+M             1.1E16      0      86000
+    N2/1.5/      
+HNCO+H = NH2+CO              2.2E07     1.7      3800
+HNCO+O = NCO+OH              2.2E06     2.11    11430
+HNCO+O = NH+CO2              9.6E07     1.41     8520
+HNCO+O = HNO+CO              1.5E08     1.57    44012
+HNCO+OH = NCO+H2O            6.4E05     2.0      2560
+HNCO+HO2 = NCO+H2O2          3.0E11      0      29000
+HNCO+NH2 = NH3+NCO           5.0E12      0       6200
+HNCO+NH = NH2+NCO            3.0E13      0      23700
+HNCO+NO2 = HNNO+CO2          2.5E12      0      26200
+HNCO+CN = HCN+NCO            1.5E13      0          0
+NCO+M = N+CO+M               3.1E16    -0.50    48000
+    N2/1.5/
+NCO+H = CO+NH                5.0E13      0          0
+NCO+O = NO+CO                4.7E13      0          0
+NCO+H2 = HNCO+H              7.6E02     3.0      4000
+NCO+OH = HCO+NO              5.0E12      0      15000
+NCO+O2 = NO+CO2              2.0E12      0      20000
+NCO+HCO = HNCO+CO            3.6E13      0          0
+NCO+CH2O = HNCO+HCO          6.0E12      0          0
+NCO+N = N2+CO                2.0E13      0          0
+NCO+NO = N2O+CO              6.2E17    -1.73      763
+NCO+NO = N2+CO2              7.8E17    -1.73      763
+NCO+NO2 = CO+NO+NO           1.3E13      0          0
+NCO+NO2 = CO2+N2O            5.4E12      0          0
+NCO+HNO = HNCO+NO            1.8E13      0          0
+NCO+HONO = HNCO+NO2          3.6E12      0          0
+NCO+NCO = CO+CO+N2           1.8E13      0          0
+NCO+CN = NCN+CO              1.8E13      0          0
+HNNO+M = N2O+H+M             2.2E15      0      21600
+HNNO+M = N2+OH+M             1.0E15      0      25600
+HNNO+H = N2O+H2              2.0E13      0          0
+HNNO+H = NNH+OH              1.0E13      0          0
+HNNO+O = N2O+OH              2.0E13      0          0
+HNNO+O = NNH+O2              1.0E13      0          0
+HNNO+OH = N2O+H2O            2.0E13      0          0
+HNNO+OH = NNH+HO2            1.0E13      0          0
+HNNO+NO = N2O+HNO            1.0E12      0          0
+HNNO+NO = NNH+NO2            3.2E12      0        270
+HNNO+NO2 = NNH+NO3           1.0E13      0          0
+HNNO+NO2 = N2O+HONO          1.0E12      0          0
+
+HCO+M = H+CO+M               1.9E17    -1.0     17020
+    N2/1.5/ O2/1.5/ CO/1.9/ CO2/3.0/ H2O/5.0/
+HCO+H = CO+H2                1.2E13     0.25        0
+HCO+O = CO+OH                3.0E13      0          0
+HCO+O = CO2+H                3.0E13      0          0
+HCO+OH = CO+H2O              1.1E14      0          0
+HCO+O2 = CO+HO2              7.6E12      0        400
+CH2O+M = HCO+H+M             3.3E16      0      81000
+    N2/1.5/ O2/1.5/ H2O/10.0/
+CH2O+H = HCO+H2              2.2E08     1.77     3000
+CH2O+O = HCO+OH              1.8E13      0       3080
+CH2O+OH = HCO+H2O            3.4E09     1.18     -447
+CH2O+HO2 = HCO+H2O2          2.0E12      0      11665
+CH2O+O2 = HCO+HO2            2.1E13      0      38950
+CH3+H(+M) = CH4(+M)          6.0E16     -1.0    0
+ LOW/8.0E26 -3.0 0/
+ SRI/0.45 797.0 979.0/
+ H2/2/ CO/2/ CO2/3/  H2O/5/                                                  
+CH4+H = CH3+H2               1.30E04      3.0   8047
+CH4+O = CH3+OH               6.9E08       1.56  8484
+CH4+OH = CH3+H2O           1.6E07  1.83  2782
+CH4+O2 = CH3+HO2           4.0E13  0     56908
+CH4+HO2 = CH3+H2O2         1.8E11  0     18678
+CH4+CH2 = CH3+CH3          4.3E12  0     10034
+CH4+CH2* = CH3+CH3         4.3E13  0     0
+CH4+CH = C2H4+H            6.0E13  0     0         
+CH3+M = CH2+H+M            1.0E16  0     90607
+CH2*+H2 = CH3+H            7.2E13  0     0         
+CH3+O = CH2O+H             8.4E13  0     0         
+CH3+OH = CH2*+H2O          5.0E13  0     0         
+CH3+O2 = CH3O+O            1.1E13  0     27818
+CH3+O2 = CH2O+OH           3.3E11  0     9001
+CH3+HO2 = CH3O+OH          2.0E13  0     0         
+CH3+CH2O = CH4+HCO         5.5E03  2.81  5862
+CH3+HCO = CH4+CO           1.2E14  0     0         
+CH3+CH2 = C2H4+H           4.2E13  0     0         
+CH3+CH2* = C2H4+H          2.0E13  0     0         
+CH3+CH = C2H3+H            3.0E13  0     0         
+CH3+C = C2H2+H             5.0E13  0     0         
+CH3O+M = CH2O+H+M          1.9E26  -2.7  30600
+CH3O+H = CH2O+H2           2.0E13  0     0         
+CH3O+O= CH2O+OH            1.5E13  0     0         
+CH3O+OH = CH2O+H2O         1.0E13  0     0         
+CH3O+O2 = CH2O+HO2         4.0E10  0     2126
+CH2OH+M = CH2O+H+M         1.1E43  -8.0  42999
+CH2OH+H = CH3+OH           1.0E14  0     0         
+CH2OH+H = CH2O+H2          6.0E12  0     0         
+CH2OH+O = CH2O+OH          5.0E13  0     0         
+CH2OH+OH = CH2O+H2O        1.0E13  0     0         
+CH2OH+O2 = CH2O+HO2        2.2E14  0     4709
+CH2O+M = CO+H2+M           8.3E15  0     69545
+CH2O+CH = CH2CO+H          9.5E13  0     -517
+HCO+CH2 = CH3+CO           2.0E13  0     0         
+CH2+H = CH+H2              6.0E12  0     -1788
+CH2+O = CO+H+H             7.0E13  0     0         
+CH2+O = CO+H2              5.0E13  0     0         
+CH2+OH = CH2O+H            3.0E13  0     0         
+CH2+OH = CH+H2O            1.1E07  2.0   2981
+CH2+O2 = CH2O+O            5.0E13  0     8941
+CH2+O2 = CO+H2O            8.0E12  0     1490
+CH2+O2 = CO+OH+H           1.7E13  0     1490
+CH2+CO2 = CO+CH2O          1.1E11  0     994
+CH2+CH2 = C2H2+2H          1.2E14  0     0         
+CH2+CH = C2H2+H            4.0E13  0     0         
+CH2+C = C2H+H              5.0E13  0     0         
+CH2*+M = CH2+M             1.0E13  0     0         
+ H/20/ H2O/3/ C2H2/4/                                                        
+CH2*+H = CH+H2             3.0E13  0     0         
+CH2*+O = CO+2H             3.0E13  0     0         
+CH2*+OH = CH2O+H           3.0E13  0     0         
+CH2*+O2 = CO+OH+H          3.1E13  0     0         
+CH2*+CO2 = CH2O+CO         6.6E12  0     0
+CH+H = C+H2                1.5E14  0     0         
+CH+O = CO+H                6.0E13  0     0         
+CH+OH = HCO+H              3.0E13  0     0         
+CH+OH = C+H2O              4.0E07  2.0   2980
+CH+O2 = HCO+O              3.3E13  0     0        
+CH+H2O = CH2O+H            5.7E12  0     -755
+CH+CO2 = HCO+CO            3.4E12  0     686
+C+OH = CO+H                5.0E13  0     0         
+C+O2 = CO+O                2.0E13  0     0         
+CH3+CH3(+M) = C2H6(+M)     3.6E13  0     0
+ LOW/3.2E41 -7.03 2762/
+ TROE/0.38 1180.0 73.0/	
+C2H6+H = C2H5+H2           1.4E09  1.5   7411
+C2H6+O = C2H5+OH           2.7E06  2.4   5842
+C2H6+OH = C2H5+H2O         7.2E06  2.0   854
+C2H6+O2 = C2H5+HO2         6.0E13  0     51861
+C2H6+CH3 = C2H5+CH4        1.5E-07 6.0   6040
+C2H4+H(+M) = C2H5(+M)      2.2E13  0     2066
+ LOW/6.4E27 -2.6 54/
+ H2/2/ CO/2/ CO2/3/ H2O/5/                                                    
+C2H5+H = CH3+CH3           1.0E14  0     0     
+C2H5+O2 = C2H4+HO2         8.4E11  0     3875
+C2H4+M = C2H2+H2+M         1.5E15  0     55437
+C2H4+M = C2H3+H+M          1.4E16  0     81268
+C2H4+H = C2H3+H2           5.4E14  0     15002
+C2H4+OH = C2H3+H2O         1.2E14  0     6140
+C2H4+CH3 = C2H3+CH4        6.6E00  3.7   9538
+C2H2+H(+M) = C2H3(+M)      5.5E12  0.0   2404
+ LOW/2.7E27 0 2404/
+ H2/2/ CO/2/ CO2/3/ H2O/5/                                                    
+C2H3+H = C2H2+H2           3.0E13  0     0         
+C2H3+O = CH2CO+H           3.3E13  0     0         
+C2H3+OH = C2H2+H2O         3.0E13  0     0         
+C2H3+O2 = C2H2+HO2         5.4E12  0     0         
+C2H2+M = C2H+H+M           4.0E16  0     106801
+C2H+H2 = C2H2+H            1.5E13  0     3100
+C2H2+O = CH2+CO            7.0E03  2.8   497
+C2H2+O = HCCO+H            1.5E04  2.8   497
+C2H2+OH = CH2CO+H          2.2E-04 4.5   -994
+C2H2+OH = C2H+H2O          3.4E07  2.0   13909
+C2H2+CH2 = C3H3+H          1.2E13  0     6557
+C2H2+CH2* = C3H3+H         1.7E14  0     0         
+C2H2+CH = C3H2+H           8.4E13  0     0         
+C2H2+C2H = C4H2+H          4.0E13  0     0         
+CH2CO(+M) = CH2+CO(+M)     3.0E14  0     70936
+ LOW/3.6E15 0 59272/
+CH2CO+H = CH3+CO           3.6E12  0     2345
+CH2CO+O = CH2O+CO          2.5E11  0     1351
+CH2CO+O = CH2+CO2          1.5E12  0     1351
+CH2CO+OH = CH2O+HCO        1.0E13  0     0         
+HCCO+H = CH2*+CO           1.5E14  0     0         
+HCCO+O = CO+CO+H           9.6E13  0     596
+HCCO+OH = HCO+CO+H         1.0E13  0     0         
+HCCO+O2 = CO+CO+OH         1.6E12  0     854
+HCCO+CH2 = C2H3+CO         3.0E13  0     0         
+HCCO+CH = C2H2+CO          5.0E13  0     0         
+HCCO+HCCO = C2H2+2CO       1.0E13  0     0         
+C2H+O = CH+CO              1.0E13  0     0         
+C2H+OH = HCCO+H            2.0E13  0     0         
+C2H+O2 = HCCO+O            2.3E13  0     0         
+C2H+O2 = HCO+CO            2.4E12  0     0         
+C4H2+O = C3H2+CO           2.7E13  0     1709
+C4H2+OH = C3H2+HCO         3.0E13  0     0         
+C3H3+H = C3H2+H2           5.0E13  0     2981
+C3H3+O = CH2O+C2H          1.4E14  0     0         
+C3H3+OH = C3H2+H2O         2.0E13  0     0         
+C3H3+O2 = CH2CO+HCO        3.0E10  0     2861
+C3H2+OH = C2H2+HCO         5.0E13  0     0         
+C3H2+O2 = HCCO+HCO         5.0E13  0     0         
+H2CN+M = HCN+H+M           3.0E14  0     21857
+CH3+N = H2CN+H             7.1E13  0     0         
+CH3+NO = HCN+H2O           5.3E11  0     14902
+CH3+NO = H2CN+OH           5.3E11  0     14902
+CH2+N = HCN+H              5.0E13  0     0         
+CH2+N2 = HCN+NH            1.0E13  0     73519
+CH2+NO = NCO+H2            3.5E12  0     -1093 
+HCNO+H = HCN+OH            1.0E14  0     11915
+CH2*+NO = HCN+OH           1.0E14  0     0         
+CH+N = CN+H                1.3E13  0     0        
+CH+N2 = HCN+N              4.4E12  0     21897
+CH+NO = HCN+O              1.1E14  0     0        
+CH+N2O = HCN+NO            9.6E12  0     -994
+C+N2 = CN+N                6.3E13  0     45999
+C+NO = CN+O                1.9E13  0     0         
+C+NO = CO+N                2.9E13  0     0         
+C2H3+N = HCN+CH2           2.0E13  0     0         
+HCCO+N = HCN+CO            5.0E13  0     0         
+HCCO+NO = HCNO+CO          2.0E13  0     0         
+C2H+NO = HCN+CO            2.1E13  0     0         
+C3H3+N = HCN+C2H2          1.0E14  0     0 
+
+CH2OH + HCO = CH3OH + CO          1.000E+13  0.00  0.000E+00
+CH2OH + CH2OH = CH3OH + CH2O      3.000E+12  0.00  0.000E+00
+CH2OH + CH3O = CH3OH + CH2O       2.400E+13  0.00  0.000E+00
+
+CH3O + HCO = CH3OH + CO           9.000E+13  0.00  0.000E+00
+CH3O + CH3O = CH3OH + CH2O        6.000E+13  0.00  0.000E+00
+OH+CH3(+M)<=>CH3OH(+M)            2.790E+18   -1.430    1330.00
+ LOW  /  4.000E+36   -5.920   3140.00/
+ TROE/   .4120  195.0  5900.00  6394.00/
+ H2/2.00/ H2O/6.00/ CH4/2.00/ CO/1.50/ CO2/2.00/ C2H6/3.00/
+H+CH2OH(+M)<=>CH3OH(+M)           1.055E+12     .500      86.00
+ LOW  /  4.360E+31   -4.650   5080.00/
+ TROE/   .600  100.00  90000.0  10000.0 /
+ H2/2.00/ H2O/6.00/ CH4/2.00/ CO/1.50/ CO2/2.00/ C2H6/3.00/
+H+CH3O(+M)<=>CH3OH(+M)            2.430E+12     .515      50.00
+ LOW  /  4.660E+41   -7.440   14080.0/
+ TROE/   .700  100.00  90000.0 10000.00 /
+ H2/2.00/ H2O/6.00/ CH4/2.00/ CO/1.50/ CO2/2.00/ C2H6/3.00/
+CH3OH + H = CH2OH + H2            3.200E+13  0.00  6.095E+03
+CH3OH + H = CH3O + H2             8.000E+12  0.00  6.095E+03 
+CH3OH + O = CH2OH + OH            3.880E+05  2.50  3.080E+03
+CH3OH + OH = CH3O + H2O           1.000E+06  2.10  4.967E+02
+CH3OH + OH = CH2OH + H2O          7.100E+06  1.80 -5.960E+02
+CH3OH + O2 = CH2OH + HO2          2.050E+13  0.00  4.490E+04
+CH3OH + HCO = CH2OH + CH2O        9.635E+03  2.90  1.311E+04
+CH3OH + HO2 = CH2OH + H2O2        3.980E+13  0.00  1.940E+04
+CH3OH + CH3 = CH2OH + CH4         3.190E+01  3.17  7.172E+03
+CH3O + CH3OH = CH3OH + CH2OH      3.000E+11  0.00  4.060E+03
+
+END

@@ -1,0 +1,38 @@
+! Fisher E.M., Pitz W.J., Curran H.J., Westbrook, C.K., 
+! "Detailed Chemical Kinetic Mechanisms for Combustion of Oxygenated Fuels", 
+! Proceedings of the Combustion Institute, Volume 28, p. 1579-1586, 2000;!
+! Lawrence Livermore National Laboratory, Livermore, CA, UCRL-JC-137097. 
+! UCRL-WEB-204236, Review and release date: May 19, 2004.
+!
+6/16/2000
+Elizabeth M. Fisher
+
+
+The following are some notes explaining the choice of species names
+in the methyl butanoate and methyl formate mechanisms:
+
+mb=methyl butanoate
+mp=methyl propanoate
+me=methyl ethanoate
+mm=methyl methanoate (=methyl formate)
+ba= butanoic acid
+
+
+Carbons are numbered starting with 1 = carbonyl carbon.
+m denotes the carbon in the methoxy group
+Groups attached to a given carbon atom are listed after the number or letter
+  labelling that carbon atom.
+j denotes a radical site
+*o denotes an oxygen atom attached via a double bond.
+  For example, mb3j4ooh is methyl butanoate with a hydroxyl group attached to
+  the terminal cabon (number 4) and a hydrogen atom missing from the carbon
+  next to the terminal one (number 3)
+d denotes a double bond connecting carbon n and carbon n+1.  For example,
+   mb2d has a double bond between carbon 2 and carbon 3.
+
+An example of a cyclic species is:, mbcy4o2, which resembles mb but
+  has an O bonded between carbons 4 and 2.
+
+Note that in many cases a more conventional notation is used.
+  For example, ch3oco is used instead of mm1j.  This is mainly for
+  consistency with other reaction mechanisms.

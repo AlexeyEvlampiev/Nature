@@ -1,0 +1,258 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>    
+    <TargetFramework>netcoreapp1.1</TargetFramework>    
+    <RootNamespace>Nature</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Chemkin\Thermo\thermo30.dat" />
+    <None Remove="Chemkin\Thermo\transport30.dat" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nature\Nature.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Chemkin\Thermo\SpeciesNasaThermoHeaderResource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SpeciesNasaThermoHeaderResource.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Chemkin\Thermo\ThermoCollectionsResource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ThermoCollectionsResource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Chemkin\Thermo\SpeciesNasaThermoHeaderResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SpeciesNasaThermoHeaderResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Chemkin\Thermo\ThermoCollectionsResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ThermoCollectionsResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Chemkin\Mechanisms\abo-aaumech\aaumech.inp.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\abo-aaumech\auutherm.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\gri-3.0\grimech30.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\gri-3.0\thermo30.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\gri-3.0\transport.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-2 4 6 trinitro toluene tnt\tnt_v1_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-2 4 6 trinitro toluene tnt\tnt_v1_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Alcohols-Butanol Isomers\butanol_isomers_CnF_ver7_mech_inp.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Alcohols-Butanol Isomers\butanol_isomers_CnF_ver7_mech_inp_highT.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Alcohols-Butanol Isomers\butanol_isomers_CnF_ver7_tran_dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Alcohols-Butanol Isomers\mmc5_butanol_isomers_CnF_ver7_mech_lowPflames_inp.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Alcohols-Butanol Isomers\mmc7_butanol_isomers_CnF_ver8_tran_dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Alcohols-iso-Pentanol\i-pentanol_therm_v33L-cl_release_dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Alcohols-iso-Pentanol\i-pentanol_v46_06_release_inp.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-alkyl carbonates-dimethyl carbonate\dmc_1f_dmm_24_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-alkyl carbonates-dimethyl carbonate\dmc_1i_dmm_24_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-alkyl carbonates-dimethyl carbonate\dmc_2c_tran.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-aromatic and pah formation- toluene ethyl propyl butyl benzene\Alkylaromatics.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-aromatic and pah formation- toluene ethyl propyl butyl benzene\Alkylaromatics.inp.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-aromatic and pah formation- toluene ethyl propyl butyl benzene\Alkylaromatics.tran.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-C1-C4 mechanism with PAH formation\nbutane_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-C1-C4 mechanism with PAH formation\nbutane_thermo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-C1-C4 mechanism with PAH formation\nbutane_transport.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-cycloalkanes-cyclohexane\chx_all_vern7_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-cycloalkanes-cyclohexane\chx_ver1h_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-dimethyl ether\dme_24_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-dimethyl ether\dme_24_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-dimethyl ether\dme_24_tran_dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-effect of no addition to hydrocarbons-c1c4 hydrocarbons with no addition\nox_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-effect of no addition to hydrocarbons-c1c4 hydrocarbons with no addition\nox_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl butanoate and methyl formate\mbmechrev.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl butanoate and methyl formate\mb_notes.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl butanoate and methyl formate\mmmbthermo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl butanoate and methyl formate\mmmechrev.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl decanoates\md5d_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl decanoates\md5d_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl decanoates\md9d_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl decanoates\md9d_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl decanoate\md_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-methyl esters-methyl decanoate\md_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-organophosphorus compounds-effect on flame speeds\organophos_c3_30c_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-organophosphorus compounds-effect on flame speeds\organophos_ic8_2e_tran_dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-organophosphorus compounds-effect on flame speeds\organophos_v1t_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-organophosphorus compounds-in propane flames\organophos_c3_30c_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-organophosphorus compounds-in propane flames\organophos_ic8_2e_tran_dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-organophosphorus compounds-in propane flames\organo_v1m_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-organophosphorus compounds-under incineration conditions\mecph_v2b.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-organophosphorus compounds-under incineration conditions\orgphos_thermo_v5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Surrogates-C10 Methyl Ester Surrogates for Biodiesel\md-nc7_mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Surrogates-C10 Methyl Ester Surrogates for Biodiesel\md9dnc7_mech_v1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Surrogates-C10 Methyl Ester Surrogates for Biodiesel\md9dnc7_therm_v1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Surrogates-Diesel surrogate, detailed and reduced\diesel_surrogate_transport.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Surrogates-Diesel surrogate, detailed and reduced\Xylene+C12.mech.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Surrogates-Gasoline Surrogate\ChemDetailed.inp.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Surrogates-Gasoline Surrogate\gasoline_surrogate_therm.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\llnl-Surrogates-Gasoline Surrogate\gasoline_surrogate_transport.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\mit-Detailed Modeling of Soot Formation\mitsootmodel1atmsymp2004.mec.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\mit-Detailed Modeling of Soot Formation\mitsootmodellowpsymp2004.mec.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\mit-Detailed Modeling of Soot Formation\thermmitsymp2004.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\mit-Detailed Modeling of Soot Formation\tranmitsymp2004.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\mit-Kinetic Modeling of Premixed Flames\pub20torr.mec.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\mit-Kinetic Modeling of Premixed Flames\thermhrjbh1101.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\mit-Kinetic Modeling of Premixed Flames\transhrjbh1101.dat.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\mit-Marrsootmodel\Marrsootmodel.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\SanDiego\20161214_log.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\SanDiego\sandiego20160815_therm.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\SanDiego\sandiego20160815_trans.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Chemkin\Mechanisms\SanDiego\sandiego20161214_mechCK.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
