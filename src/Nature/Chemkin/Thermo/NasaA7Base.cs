@@ -5,9 +5,9 @@
     using System.Collections.Generic;
     using System.Text;
 
-    public abstract class SpeciesNasaThermoA7 : IChemicalFormula
+    public abstract class NasaA7Base : IChemicalFormula
     {
-        public abstract SpeciesNasaThermoHeader Header { get; }
+        public abstract NasaA7Header Header { get; }
 
         public IEnumerable<string> ElementCodes => Header.ElementCodes;
 

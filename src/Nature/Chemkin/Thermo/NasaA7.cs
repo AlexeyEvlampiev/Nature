@@ -6,27 +6,32 @@
     using System.Text;
     using System.Text.RegularExpressions;
 
-    public sealed class SpeciesNasaThermoA7Classic : SpeciesNasaThermoA7
+    public sealed class NasaA7 : NasaA7Base
     {
-        private SpeciesNasaThermoHeader _header;
-        public override SpeciesNasaThermoHeader Header => _header;
+        private NasaA7Header _header;
+        public override NasaA7Header Header => _header;
+
+        public double Tmin { get; set; }
+        public double Tmax { get; set; }
+
+        public double TCommon { get; set; }
 
         public NasaA7Approximation LowTemperatureApproximation { get; private set; }
 
         public NasaA7Approximation HighTemperatureApproximation { get; private set; }
 
-        public static SpeciesNasaThermoA7Classic Parse(
+        public static NasaA7 Parse(
             string text,
-            ISpeciesNasaThermoA7ClassicDeserializationContext context = null)
+            INasaA7DeserializationContext context = null)
         {
             ChemkinMarkup markup = new ChemkinMarkup(text);
             context = context ?? new DefaultDeserializationContext();
             return Parse(markup, context, null);
         }
 
-        internal static SpeciesNasaThermoA7Classic Parse(
+        internal static NasaA7 Parse(
             ChemkinMarkup markup,
-            ISpeciesNasaThermoA7ClassicDeserializationContext context,
+            INasaA7DeserializationContext context,
             Capture capture)
         {
             int index = 0;
@@ -42,7 +47,7 @@
             var diagnosticsCallback = context.GetDiagnosticsCallback();
             var formatInfo = context.GetFormatInfo();
 
-            string urlParams = SpeciesNasaThermoHeaderFormatOptions.BuildUrlParams(options);
+            string urlParams = NasaA7HeaderFormatOptions.BuildUrlParams(options);
             var regex = session.GetOrCreate<Regex>($"nasa-a7-classic/regex?{urlParams}", 
                 ()=> 
                 {
@@ -58,9 +63,17 @@
                     return new Regex(pattern, RegexOptions.Multiline);
                 });
 
-            var result = new SpeciesNasaThermoA7Classic();
+            var result = new NasaA7();
             var match = regex.Match(markup.AdaptedText, index, length);
-            result._header = SpeciesNasaThermoHeader.Parse(markup, context, match.Groups["header"]);
+            result._header = NasaA7Header.Parse(markup, context, match.Groups["header"]);
+
+            double? tmin = result._header.TminOverride ?? context.DefaultTmin;
+            double? tmax = result._header.TmaxOverride ?? context.DefaultTmax;
+            double? tcommon = result._header.TcommonOverride ?? context.DefaultTcommon;
+
+            result.Tmin = tmin.Value;
+            result.Tmax = tmax.Value;
+            result.TCommon = tcommon.Value;
 
             var highTempRange = new double[7];
             var lowTempRange = new double[7];
@@ -122,7 +135,7 @@
 
         public override bool Equals(object obj)
         {
-            var other = obj as SpeciesNasaThermoA7Classic;
+            var other = obj as NasaA7;
             if (ReferenceEquals(other, null))
                 return false;
             return this.Header.Equals(other.Header)

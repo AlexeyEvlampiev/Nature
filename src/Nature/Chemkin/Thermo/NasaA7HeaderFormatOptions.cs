@@ -4,9 +4,9 @@
     using System.Collections.Generic;
     using System.Text;
 
-    public class SpeciesNasaThermoHeaderFormatOptions : ISpeciesNasaThermoHeaderFormatOptions
+    public class NasaA7HeaderFormatOptions : INasaA7HeaderFormatOptions
     {
-        public SpeciesNasaThermoHeaderFormatOptions()
+        public NasaA7HeaderFormatOptions()
         {
             SpeciesIdWidth = 18;
             DateWidth = 6;
@@ -21,7 +21,7 @@
         public int ElementsMaxCount { get; set; }
 
 
-        public static string BuildUrlParams(ISpeciesNasaThermoHeaderFormatOptions options)
+        public static string BuildUrlParams(INasaA7HeaderFormatOptions options)
         {
             if (ReferenceEquals(options, null))
                 throw new ArgumentNullException(nameof(options));

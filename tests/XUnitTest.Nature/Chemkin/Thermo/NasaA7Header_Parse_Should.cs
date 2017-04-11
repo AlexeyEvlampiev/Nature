@@ -3,12 +3,12 @@
     using System.Text.RegularExpressions;
     using Xunit;
 
-    public class SpeciesNasaThermoHeader_Parse_Should
+    public class NasaA7Header_Parse_Should
     {
         [Fact]
         public void Work()
         {
-            var header = SpeciesNasaThermoHeader.Parse(SpeciesNasaThermoHeaderResource.CH3CHO);
+            var header = NasaA7Header.Parse(NasaA7HeaderResource.CH3CHO);
             Assert.Equal("CH3CHO", header.SpeciesCode);
             Assert.Equal("L 8/88", header.Tag);
             Assert.Equal(2.0, header["C"]);

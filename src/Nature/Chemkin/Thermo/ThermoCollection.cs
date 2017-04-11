@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -69,6 +70,7 @@ namespace Nature.Chemkin.Thermo
                     return new Regex(pattern, RegexOptions.Multiline);
                 });
 
+            context.DefaultTcommon = context.DefaultTmax = context.DefaultTmin = null;
             var formatInfo = context.GetFormatInfo();
             var match = regex.Match(markup.AdaptedText, index, length);
             var defaultTemperaturesGroup = match.Groups["temp"];
@@ -82,6 +84,10 @@ namespace Nature.Chemkin.Thermo
                     double value = formatInfo.ToDouble(c.Value);
                     temperatures[i] = value;
                 }
+                Array.Sort(temperatures);
+                context.DefaultTmin = temperatures[0];
+                context.DefaultTcommon = temperatures[1];
+                context.DefaultTmax = temperatures[2];
             }
 
             var body = match.Groups["body"];
@@ -100,17 +106,27 @@ namespace Nature.Chemkin.Thermo
                 });
 
             var collection = new ThermoCollection();
-            for (Match itemMatch = bodyRegex.Match(markup.AdaptedText, body.Index, body.Length); 
+            var exceptions = new List<ChemkinFormatException>();
+            for (Match itemMatch = bodyRegex.Match(markup.AdaptedText, body.Index, body.Length);
                 itemMatch.Success;
                 itemMatch = itemMatch.NextMatch())
             {
-                var classic = SpeciesNasaThermoA7Classic.Parse(markup, context, itemMatch);
-                collection._items.Add(classic);
+                try
+                {
+                    var classic = NasaA7.Parse(markup, context, itemMatch);
+                    collection._items.Add(classic);
+                }
+                catch (ChemkinFormatException ex)
+                {
+                    exceptions.Add(ex);
+                }
             }
 
+            if (exceptions.Any())
+            {
+                throw new AggregateChemkinFormatException(exceptions);
+            }
             return collection;
-            //throw new NotImplementedException();
-
         }
 
         public IEnumerator<object> GetEnumerator()
@@ -123,4 +139,5 @@ namespace Nature.Chemkin.Thermo
             return ((IReadOnlyList<object>)_items).GetEnumerator();
         }
     }
+
 }

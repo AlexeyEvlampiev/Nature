@@ -19,8 +19,8 @@ namespace Nature.Chemkin
 
         public DefaultFormatInfo()
         {
-            this.m_elementIdRegex = new Regex(RegexUtils.MinifyExact(ChemkinPatterns.ElementId));
-            this.m_realNumberRegex = new Regex(RegexUtils.MinifyExact(ChemkinPatterns.SignedRealNumber));
+            this.m_elementIdRegex = new Regex(RegexUtils.MinifyStrict(ChemkinPatterns.ElementId));
+            this.m_realNumberRegex = new Regex(RegexUtils.MinifyStrict(ChemkinPatterns.SignedRealNumber));
         }
 
         public bool IsValidElementId(string value)
@@ -43,9 +43,9 @@ namespace Nature.Chemkin
             return "E".Equals(id, StringComparison.OrdinalIgnoreCase);
         }
 
-        public bool IsValidPgaseIdentifier(string value)
+        public bool IsValidPhaseIdentifier(string phaseId)
         {
-            return this.m_phaseIdentifiers.Contains(value);
+            return this.m_phaseIdentifiers.Contains(phaseId);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Nature.Chemkin.Thermo
 {
-    public interface ISpeciesNasaThermoHeaderFormatOptions
+    public interface INasaA7HeaderFormatOptions
     {
         int SpeciesIdWidth { get; }
         int DateWidth { get; }

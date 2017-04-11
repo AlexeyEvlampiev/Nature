@@ -25,10 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Chemkin\Thermo\SpeciesNasaThermoHeaderResource.Designer.cs">
+    <Compile Update="Chemkin\Thermo\NasaA7HeaderResource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>SpeciesNasaThermoHeaderResource.resx</DependentUpon>
+      <DependentUpon>NasaA7HeaderResource.resx</DependentUpon>
     </Compile>
     <Compile Update="Chemkin\Thermo\ThermoCollectionsResource.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -38,9 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Chemkin\Thermo\SpeciesNasaThermoHeaderResource.resx">
+    <EmbeddedResource Update="Chemkin\Thermo\NasaA7HeaderResource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>SpeciesNasaThermoHeaderResource.Designer.cs</LastGenOutput>
+      <LastGenOutput>NasaA7HeaderResource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Chemkin\Thermo\ThermoCollectionsResource.resx">
       <Generator>ResXFileCodeGenerator</Generator>

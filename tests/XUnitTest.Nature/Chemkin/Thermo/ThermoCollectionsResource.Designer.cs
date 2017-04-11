@@ -64,6 +64,22 @@ namespace Nature.Chemkin.Thermo {
         /// <summary>
         ///   Looks up a localized string similar to THERMO
         ///   300.000  1000.000  5000.000
+        ///H                 120186H   1               G  0300.00   5000.00  1000.00      1
+        /// 0.02500000E+02 0.00000000E+00 0.00000000E+00 0.00000000E+00 0.00000000E+00    2
+        /// 0.02547162E+06-0.04601176E+01 0.02500000E+02 0.00000000E+00 0.00000000E+00    3
+        /// 0.00000000E+00 0.00000000E+00 0.02547162E+06-0.04601176E+01                   4
+        ///H2                121286H   2               G  0300.00   5000.00  1000.00      1
+        /// 0.02991423E+02 0.07000644E-02-0.05633828E-06-0.09231578E-10 0.158275 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string thermmitsymp2004_dat {
+            get {
+                return ResourceManager.GetString("thermmitsymp2004_dat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to THERMO
+        ///   300.000  1000.000  5000.000
         ///! GRI-Mech Version 3.0 Thermodynamics released 7/30/99
         ///! NASA Polynomial format for CHEMKIN-II
         ///! see README file for disclaimer

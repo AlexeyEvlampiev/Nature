@@ -10,6 +10,6 @@
 
         bool IsElectronId(string id);
 
-        bool IsValidPgaseIdentifier(string value);
+        bool IsValidPhaseIdentifier(string phaseId);
     }
 }

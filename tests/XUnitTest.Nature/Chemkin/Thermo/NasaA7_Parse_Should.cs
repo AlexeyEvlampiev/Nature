@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using Xunit;
 
 namespace Nature.Chemkin.Thermo
 {
-    public class SpeciesNasaThermoA7Classic_Parse_Should
+    public class NasaA7_Parse_Should
     {
         [Fact]
         public void Work()
         {
-            var thermo = SpeciesNasaThermoA7Classic.Parse(@"
+            var thermo = NasaA7.Parse(@"
 CH2CHO            SAND86O   1H   3C   2     G   300.000  5000.000  1000.000    1
  0.05975670E+02 0.08130591E-01-0.02743624E-04 0.04070304E-08-0.02176017E-12    2
  0.04903218E+04-0.05045251E+02 0.03409062E+02 0.10738574E-01 0.01891492E-04    3

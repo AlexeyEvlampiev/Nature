@@ -10,7 +10,7 @@ namespace Nature
             return Regex.Replace(pattern, @"\s+", string.Empty);
         }
 
-        internal static string MinifyExact(string pattern)
+        internal static string MinifyStrict(string pattern)
         {
             pattern = Minify(pattern);
             return string.Format("{0}{1}{2}",

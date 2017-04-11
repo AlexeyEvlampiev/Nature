@@ -6,7 +6,7 @@ namespace Nature.Chemkin.Thermo
 {
     public interface IThermoCollectionDeserializationContext : 
         IDeserializationContext,
-        ISpeciesNasaThermoA7ClassicDeserializationContext
+        INasaA7DeserializationContext
     {
     }
 }

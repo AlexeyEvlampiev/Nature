@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Nature.Common
 {
-    public interface IChemicalFormula
+    public interface IChemicalFormula 
     {
         IEnumerable<string> ElementCodes { get; }
 

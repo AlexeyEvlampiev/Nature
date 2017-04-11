@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,10 +17,24 @@ namespace Nature.Chemkin.Thermo
             var collection = ThermoCollection.Parse(ThermoCollectionsResource.thermo30);
             Assert.Equal(53, collection.Count);
 
-            foreach (var item in collection.OfType<SpeciesNasaThermoA7Classic>())
+            foreach (var item in collection.OfType<NasaA7>())
             {
                 var markup = item.ToString();
-                var clonned = SpeciesNasaThermoA7Classic.Parse(markup);
+                var clonned = NasaA7.Parse(markup);
+                Assert.Equal(item, clonned);
+            }
+        }
+
+        [Fact]
+        public void Test2()
+        {
+            var collection = ThermoCollection.Parse(ThermoCollectionsResource.thermmitsymp2004_dat);
+            Assert.Equal(304, collection.Count);
+
+            foreach (var item in collection.OfType<NasaA7>())
+            {
+                var markup = item.ToString();
+                var clonned = NasaA7.Parse(markup);
                 Assert.Equal(item, clonned);
             }
         }
@@ -35,8 +50,15 @@ namespace Nature.Chemkin.Thermo
             var thermoFiles = mechanisms.GetFiles("*therm*", SearchOption.AllDirectories);
             foreach (var tf in thermoFiles)
             {
-                string text = File.ReadAllText(tf.FullName);
-                RunTests(text);
+                try
+                {
+                    string text = File.ReadAllText(tf.FullName);
+                    RunTests(text);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(tf.DirectoryName);
+                }
             }
         }
 
@@ -44,10 +66,10 @@ namespace Nature.Chemkin.Thermo
         {
             var collection = ThermoCollection.Parse(text);
             
-            foreach (var item in collection.OfType<SpeciesNasaThermoA7Classic>())
+            foreach (var item in collection.OfType<NasaA7>())
             {
-                var markup = item.ToString();
-                var clonned = SpeciesNasaThermoA7Classic.Parse(markup);
+                var markup = item.ToString();                
+                var clonned = NasaA7.Parse(markup);
                 Assert.Equal(item, clonned);
             }
         }

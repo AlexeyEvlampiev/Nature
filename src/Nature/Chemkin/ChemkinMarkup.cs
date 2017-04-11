@@ -6,13 +6,16 @@ using System.Text.RegularExpressions;
 namespace Nature.Chemkin
 {
     public class ChemkinMarkup
-    {
+    {        
+        readonly Lazy<TextPosition[]> _positions;
+
         public ChemkinMarkup(string text) 
             : this($"text:{Guid.NewGuid()}", text)
         { }
         
         public ChemkinMarkup(string id, string text)
         {
+            this.Id = id;
             char space = Convert.ToChar(32);
             OriginalText = text;
             AdaptedText = text.ToUpper();
@@ -33,7 +36,13 @@ namespace Nature.Chemkin
 
             if (length != AdaptedText.Length)
                 throw new InvalidOperationException();
+
+            _positions = new Lazy<TextPosition[]>(() => TextPosition.Get(OriginalText));
         }
+
+        public string Id { get; }
+
+        internal TextPosition this[int i] => _positions.Value[i];
 
         public string OriginalText { get; }
 
