@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Nature.Common
+﻿namespace Nature.Common
 {
-    public interface IChemicalFormula 
+    using System.Collections.Generic;
+
+    public interface IChemicalFormula : IChemicalSpeciesInfo
     {
         IEnumerable<string> ElementCodes { get; }
 

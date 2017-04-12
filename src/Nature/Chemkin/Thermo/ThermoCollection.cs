@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Nature.Common;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Nature.Chemkin.Thermo
@@ -16,6 +16,12 @@ namespace Nature.Chemkin.Thermo
         public object this[int index] => _items[index];
 
         public int Count => _items.Count;
+
+        public T FirstOrDefault<T>(string speciesCode) where T : IChemicalSpeciesInfo
+        {
+            return _items.OfType<T>()
+                .FirstOrDefault(sp => sp.SpeciesCode.Equals(speciesCode, StringComparison.OrdinalIgnoreCase));
+        }
 
         public static ThermoCollection Parse(
             string text,
@@ -70,7 +76,7 @@ namespace Nature.Chemkin.Thermo
                     return new Regex(pattern, RegexOptions.Multiline);
                 });
 
-            context.DefaultTcommon = context.DefaultTmax = context.DefaultTmin = null;
+            context.DefaultCommonTemperature = context.DefaultHighTemperature = context.DefaultLowTemperature = null;
             var formatInfo = context.GetFormatInfo();
             var match = regex.Match(markup.AdaptedText, index, length);
             var defaultTemperaturesGroup = match.Groups["temp"];
@@ -85,9 +91,9 @@ namespace Nature.Chemkin.Thermo
                     temperatures[i] = value;
                 }
                 Array.Sort(temperatures);
-                context.DefaultTmin = temperatures[0];
-                context.DefaultTcommon = temperatures[1];
-                context.DefaultTmax = temperatures[2];
+                context.DefaultLowTemperature = temperatures[0];
+                context.DefaultCommonTemperature = temperatures[1];
+                context.DefaultHighTemperature = temperatures[2];
             }
 
             var body = match.Groups["body"];
@@ -106,7 +112,7 @@ namespace Nature.Chemkin.Thermo
                 });
 
             var collection = new ThermoCollection();
-            var exceptions = new List<ChemkinFormatException>();
+            var exceptions = new List<ChemkinException>();
             for (Match itemMatch = bodyRegex.Match(markup.AdaptedText, body.Index, body.Length);
                 itemMatch.Success;
                 itemMatch = itemMatch.NextMatch())
@@ -116,7 +122,7 @@ namespace Nature.Chemkin.Thermo
                     var classic = NasaA7.Parse(markup, context, itemMatch);
                     collection._items.Add(classic);
                 }
-                catch (ChemkinFormatException ex)
+                catch (ChemkinException ex)
                 {
                     exceptions.Add(ex);
                 }
@@ -124,8 +130,9 @@ namespace Nature.Chemkin.Thermo
 
             if (exceptions.Any())
             {
-                throw new AggregateChemkinFormatException(exceptions);
+                throw ChemkinException.Aggregate(exceptions);
             }
+
             return collection;
         }
 

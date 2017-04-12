@@ -14,12 +14,21 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ChemkinPatterns.tt</DependentUpon>
     </Compile>
+    <Compile Update="Constants.generated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Constants.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Chemkin\ChemkinPatterns.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ChemkinPatterns.generated.cs</LastGenOutput>
+    </None>
+    <None Update="Constants.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Constants.generated.cs</LastGenOutput>
     </None>
   </ItemGroup>
 

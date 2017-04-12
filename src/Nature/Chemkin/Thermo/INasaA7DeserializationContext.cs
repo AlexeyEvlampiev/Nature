@@ -6,9 +6,7 @@ namespace Nature.Chemkin.Thermo
         IDeserializationContext,
         INasaA7HeaderDeserializationContext
     {
-        double? DefaultTmin { get; set; }
-        double? DefaultTmax { get; set; }
-        double? DefaultTcommon { get; set; }
+        
 
     }
 }

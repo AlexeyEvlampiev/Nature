@@ -20,9 +20,9 @@
         public string Tag { get; private set; }
         public char Phase { get; private set; }
 
-        public double? TminOverride { get; private set; }
-        public double? TmaxOverride { get; private set; }
-        public double? TcommonOverride { get; private set; }
+        public double? LowTemperature { get; private set; }
+        public double? HighTemperature { get; private set; }
+        public double? CommonTemperature { get; private set; }
 
         public IEnumerable<string> ElementCodes => _formula.Keys;
 
@@ -62,7 +62,7 @@
             var options = context.GetOptions();
             var diagnosticsCallback = context.GetDiagnosticsCallback();
             var formatInfo = context.GetFormatInfo();
-            var messageBuilder = context.GetMessageBuilder();
+            var messageBuilder = context.GetMessageBuilder();            
 
             string urlParams = NasaA7HeaderFormatOptions.BuildUrlParams(options);
             string sessionKey = $"chemical-formula/regex?{urlParams}";
@@ -144,19 +144,29 @@
 
             if (!string.IsNullOrWhiteSpace(match.Groups["tmin"].Value))
             {
-                header.TminOverride = double.Parse(match.Groups["tmin"].Value.Trim());
+                header.LowTemperature = formatInfo.ToDouble(match.Groups["tmin"].Value);
+            }
+            else
+            {
+                header.LowTemperature = context.DefaultLowTemperature;
             }
 
             if (!string.IsNullOrWhiteSpace(match.Groups["tmax"].Value))
             {
-                header.TmaxOverride = double.Parse(match.Groups["tmax"].Value.Trim());
+                header.HighTemperature = formatInfo.ToDouble(match.Groups["tmax"].Value);
             }
-
-
+            else
+            {
+                header.HighTemperature = context.DefaultHighTemperature;
+            }
 
             if (!string.IsNullOrWhiteSpace(match.Groups["tcom"].Value))
             {
-                header.TcommonOverride = double.Parse(match.Groups["tcom"].Value.Trim());
+                header.CommonTemperature = formatInfo.ToDouble(match.Groups["tcom"].Value);
+            }
+            else
+            {
+                header.CommonTemperature = context.DefaultCommonTemperature;
             }
 
 
@@ -219,7 +229,7 @@
             sb.Append(Phase);
 
             format = "{0,10}{1,10}{2,8}";
-            sb.AppendFormat(formatProvider, format, TminOverride, TmaxOverride, TcommonOverride);
+            sb.AppendFormat(formatProvider, format, LowTemperature, HighTemperature, CommonTemperature);
             foreach (var elCode in _formula.Keys.Where(k => !printedElements.Contains(k)))
             {
                 var content = _formula[elCode];

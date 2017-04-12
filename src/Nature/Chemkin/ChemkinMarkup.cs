@@ -16,25 +16,26 @@ namespace Nature.Chemkin
         public ChemkinMarkup(string id, string text)
         {
             this.Id = id;
-            char space = Convert.ToChar(32);
-            OriginalText = text;
-            AdaptedText = text.ToUpper();
+            char space = Convert.ToChar(32);                      
             if (Environment.NewLine == "\r\n")
             {
-                AdaptedText = Regex.Replace(AdaptedText, @"(?s-m)(?<!\r)(?=\n)", "\r");
+                text = Regex.Replace(text, @"(?s-m)(?<!\r)(?=\n)", "\r");
             }
-
-            int length = AdaptedText.Length;
+            OriginalText = text;
+            AdaptedText = text.ToUpper();
 
             AdaptedText = Regex
                 .Replace(AdaptedText,
                 @"(?:(?!\r\n)(?!\n)\s|!.*)+", 
                 m => new string(space, m.Length), RegexOptions.Multiline);
 
+            if (AdaptedText.Length != OriginalText.Length)
+                throw new InvalidOperationException();
+
             AdaptedText = Regex.Replace(AdaptedText, @"(?:\r?\n[^\S\n]*(?=\n))+", 
                 m => new string(space, m.Length));
 
-            if (length != AdaptedText.Length)
+            if (AdaptedText.Length != OriginalText.Length)
                 throw new InvalidOperationException();
 
             _positions = new Lazy<TextPosition[]>(() => TextPosition.Get(OriginalText));

@@ -9,5 +9,9 @@ namespace Nature.Chemkin.Thermo
         INasaA7HeaderFormatOptions GetOptions();
 
         INasaA7DiagnosticsMessageBuilder GetMessageBuilder();
+
+        double? DefaultLowTemperature { get; set; }
+        double? DefaultHighTemperature { get; set; }
+        double? DefaultCommonTemperature { get; set; }
     }
 }

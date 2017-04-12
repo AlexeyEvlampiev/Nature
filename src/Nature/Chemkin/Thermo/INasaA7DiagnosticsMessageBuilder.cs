@@ -10,5 +10,10 @@ namespace Nature.Chemkin.Thermo
         string SpeciesCodeIsMissing();
         string UnexpectedInputInSpeciesCodeArea(string defect);
         string InvalidPhaseIdentifier(string value);
+        string MissingInputEolField(int relativeLineNumber);
+        string InvalidNasaA7Format();
+        string MissingHighTemperature();
+        string MissingLowTemperature();
+        string MissingCommonTemperature();
     }
 }

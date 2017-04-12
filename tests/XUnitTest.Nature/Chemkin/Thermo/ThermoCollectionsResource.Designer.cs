@@ -63,6 +63,22 @@ namespace Nature.Chemkin.Thermo {
         
         /// <summary>
         ///   Looks up a localized string similar to THERMO
+        ///       300      1000      5000
+        ///N2                000000N   2               G       300      5000    1000      1
+        /// 2.92664000E+00 1.48797680E-03-5.68476000E-07 1.00970380E-10-6.75335100E-15    2
+        ///-9.22797700E+02 5.98052800E+00 3.29867700E+00 1.40824040E-03-3.96322200E-06    3
+        /// 5.64151500E-09-2.44485400E-12-1.02089990E+03 3.95037200E+00                   4
+        ///AR                000000AR  1               G       300      5000    1000      1
+        /// 2.50000000E+00 0.00000000E+00 0.00000000E+00 0.00000000E+00 0.000000 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string sandiego20160815_therm {
+            get {
+                return ResourceManager.GetString("sandiego20160815_therm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to THERMO
         ///   300.000  1000.000  5000.000
         ///H                 120186H   1               G  0300.00   5000.00  1000.00      1
         /// 0.02500000E+02 0.00000000E+00 0.00000000E+00 0.00000000E+00 0.00000000E+00    2

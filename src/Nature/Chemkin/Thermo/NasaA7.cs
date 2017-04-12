@@ -1,24 +1,56 @@
 ﻿namespace Nature.Chemkin.Thermo
 {
-    using Nature.Chemkin.Common;
-    using System;
+    using Nature.Common;
     using System.Globalization;
     using System.Text;
     using System.Text.RegularExpressions;
+    using System;
 
     public sealed class NasaA7 : NasaA7Base
     {
         private NasaA7Header _header;
         public override NasaA7Header Header => _header;
 
-        public double Tmin { get; set; }
-        public double Tmax { get; set; }
+        public double LowTemperature { get; private set; }
+        public double HighTemperature { get; private set; }
+        public double CommonTemperature { get; private set; }
 
-        public double TCommon { get; set; }
+        public NasaA7ApproximationRange LowTemperatureRange { get; private set; }
 
-        public NasaA7Approximation LowTemperatureApproximation { get; private set; }
+        public NasaA7ApproximationRange HighTemperatureRange { get; private set; }
 
-        public NasaA7Approximation HighTemperatureApproximation { get; private set; }
+        public override double ReducedCp(double temperature)
+        {
+            temperature = temperature < LowTemperature ? LowTemperature : temperature;
+            temperature = temperature > HighTemperature ? HighTemperature : temperature;            
+            return temperature < CommonTemperature 
+                ? LowTemperatureRange.CalcReducedCp(temperature)
+                : HighTemperatureRange.CalcReducedCp(temperature);
+        }
+
+        public override double ReducedH(double temperature)
+        {
+            temperature = temperature < 1.0d ? 1.0d : temperature;            
+            if (temperature < LowTemperature)
+            {
+                return ReducedH(LowTemperature) * LowTemperature / temperature
+                    - ReducedCp(LowTemperature) * (LowTemperature - temperature) / temperature;
+            }
+            if (temperature > HighTemperature)
+            {
+                return ReducedH(HighTemperature) * HighTemperature / temperature
+                    + ReducedCp(HighTemperature) * (temperature - HighTemperature) / temperature;
+            }
+
+            return temperature < CommonTemperature
+                ? LowTemperatureRange.CalcReducedH(temperature)
+                : HighTemperatureRange.CalcReducedH(temperature);
+        }
+
+        public override double ReducedS(double temperature)
+        {
+            throw new NotImplementedException();
+        }
 
         public static NasaA7 Parse(
             string text,
@@ -46,6 +78,7 @@
             var options = context.GetOptions();
             var diagnosticsCallback = context.GetDiagnosticsCallback();
             var formatInfo = context.GetFormatInfo();
+            var messageBuilder = context.GetMessageBuilder();
 
             string urlParams = NasaA7HeaderFormatOptions.BuildUrlParams(options);
             var regex = session.GetOrCreate<Regex>($"nasa-a7-classic/regex?{urlParams}", 
@@ -56,24 +89,50 @@
                     options.ElementsMaxCount * options.ElementWidth + 35;
                     string pattern = $@"
                     ^(?<header>.{{{width}}} [1] .* ) \n
-                    ^(?<a>.{{15}}){{5}} .{{4}}  [2] .* \n
-                    ^(?<a>.{{15}}){{5}} .{{4}}  [3] .* \n
-                    ^(?<a>.{{15}}){{4}} .{{19}} [4]";
+                    ^(?<a>.{{15}}){{5}} (?: (?:.{{4}}  [2].*) | (?<def2>.*)) \n
+                    ^(?<a>.{{15}}){{5}} (?: (?:.{{4}}  [3].*) | (?<def3>.*)) \n
+                    ^(?<a>.{{15}}){{4}} (?: (?:.{{19}} [4].*) | (?<def4>.*)) ";
                     pattern = RegexUtils.Minify(pattern);
                     return new Regex(pattern, RegexOptions.Multiline);
                 });
 
             var result = new NasaA7();
             var match = regex.Match(markup.AdaptedText, index, length);
-            result._header = NasaA7Header.Parse(markup, context, match.Groups["header"]);
+            if (!match.Success)
+            {
+                string message = messageBuilder.InvalidNasaA7Format();
+                throw new ChemkinFormatException(index, markup, message);
+            }
 
-            double? tmin = result._header.TminOverride ?? context.DefaultTmin;
-            double? tmax = result._header.TmaxOverride ?? context.DefaultTmax;
-            double? tcommon = result._header.TcommonOverride ?? context.DefaultTcommon;
+            var headerCapture = match.Groups["header"];
 
-            result.Tmin = tmin.Value;
-            result.Tmax = tmax.Value;
-            result.TCommon = tcommon.Value;
+            result._header = NasaA7Header.Parse(markup, context, headerCapture);
+
+            double? lowTemperature = result._header.LowTemperature ?? context.DefaultLowTemperature;
+            double? highTemperature = result._header.HighTemperature ?? context.DefaultHighTemperature;
+            double? commonTemperature = result._header.CommonTemperature ?? context.DefaultCommonTemperature;
+
+            if (!lowTemperature.HasValue)
+            {
+                string message = messageBuilder.MissingLowTemperature();
+                throw new ChemkinIntegrityException(headerCapture, markup, message);
+            }
+
+            if (!highTemperature.HasValue)
+            {
+                string message = messageBuilder.MissingHighTemperature();
+                throw new ChemkinIntegrityException(headerCapture, markup, message);
+            }
+
+            if (!commonTemperature.HasValue)
+            {
+                string message = messageBuilder.MissingCommonTemperature();
+                throw new ChemkinIntegrityException(headerCapture, markup, message);
+            }
+
+            result.LowTemperature = lowTemperature.Value;
+            result.HighTemperature = highTemperature.Value;
+            result.CommonTemperature = commonTemperature.Value;
 
             var highTempRange = new double[7];
             var lowTempRange = new double[7];
@@ -91,8 +150,30 @@
                 }
             }
 
-            result.HighTemperatureApproximation = new NasaA7Approximation(highTempRange);
-            result.LowTemperatureApproximation = new NasaA7Approximation(lowTempRange);
+            result.HighTemperatureRange = new NasaA7ApproximationRange(highTempRange);
+            result.LowTemperatureRange = new NasaA7ApproximationRange(lowTempRange);
+
+            var def2 = match.Groups["def2"];
+            var def3 = match.Groups["def3"];
+            var def4 = match.Groups["def4"];
+            if (def2.Success)
+            {
+                string message = messageBuilder.MissingInputEolField(2);
+                diagnosticsCallback.Error(def4, markup, message);
+            }
+
+            if (def3.Success)
+            {
+                string message = messageBuilder.MissingInputEolField(3);
+                diagnosticsCallback.Error(def4, markup, message);
+            }
+
+            if (def4.Success)
+            {
+                string message = messageBuilder.MissingInputEolField(4);
+                diagnosticsCallback.Error(def4, markup, message);
+            }
+
             return result;
         }
 
@@ -106,28 +187,28 @@
             string exp = ", 15:0.00000000E+00";
             builder.AppendFormat(formatProvider,
                 @"{0$}{1$}{2$}{3$}{4$}{5,5}".Replace("$", exp),
-                HighTemperatureApproximation.A1,
-                HighTemperatureApproximation.A2,
-                HighTemperatureApproximation.A3,
-                HighTemperatureApproximation.A4,
-                HighTemperatureApproximation.A5,
+                HighTemperatureRange.A1,
+                HighTemperatureRange.A2,
+                HighTemperatureRange.A3,
+                HighTemperatureRange.A4,
+                HighTemperatureRange.A5,
                 2);
             builder.AppendLine();
             builder.AppendFormat(formatProvider,
                 @"{0$}{1$}{2$}{3$}{4$}{5,5}".Replace("$", exp),
-                HighTemperatureApproximation.A6,
-                HighTemperatureApproximation.A7,
-                LowTemperatureApproximation.A1,
-                LowTemperatureApproximation.A2,
-                LowTemperatureApproximation.A3,
+                HighTemperatureRange.A6,
+                HighTemperatureRange.A7,
+                LowTemperatureRange.A1,
+                LowTemperatureRange.A2,
+                LowTemperatureRange.A3,
                 3);
             builder.AppendLine();
             builder.AppendFormat(formatProvider,
                 @"{0$}{1$}{2$}{3$}{4,20}".Replace("$", exp),
-                LowTemperatureApproximation.A4,
-                LowTemperatureApproximation.A5,
-                LowTemperatureApproximation.A6,
-                LowTemperatureApproximation.A7,
+                LowTemperatureRange.A4,
+                LowTemperatureRange.A5,
+                LowTemperatureRange.A6,
+                LowTemperatureRange.A7,
                 4);
             string result = builder.ToString();
             return result;
@@ -139,8 +220,8 @@
             if (ReferenceEquals(other, null))
                 return false;
             return this.Header.Equals(other.Header)
-                && this.HighTemperatureApproximation.Equals(other.HighTemperatureApproximation)
-                && this.LowTemperatureApproximation.Equals(other.LowTemperatureApproximation);
-        }
+                && this.HighTemperatureRange.Equals(other.HighTemperatureRange)
+                && this.LowTemperatureRange.Equals(other.LowTemperatureRange);
+        }        
     }
 }
