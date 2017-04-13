@@ -23,8 +23,23 @@
                 Assert.Equal(item, clonned);
             }
 
-            var ch4 = collection.FirstOrDefault<ISpeciesThermo>("CH4");
-            double dhf = ch4.H(298.15);
+            var comparer = DoubleEqualityComparer.FromRelativeTolerance(2.0e-2);
+            var ch4 = collection.FirstOrDefault<ISpeciesThermodynamicFunctions>("CH4");
+            // wiki: standard state properties
+            Assert.Equal(-74.87e+3, ch4.StandardMolarEnthalpyChangeOfFormation(), comparer);
+            Assert.Equal(186.61, ch4.StandardMolarEntropy(), comparer);
+            Assert.Equal(35.69, ch4.StandardHeatCapacityAtConstantPressure(), comparer);
+
+            // http://webbook.nist.gov/cgi/cbook.cgi?ID=C74828&Mask=1
+            // Gurvich, Veyts, et al., 1989
+            Assert.Equal(46.63, ch4.MolarCp(500.0), comparer);
+            Assert.Equal(69.14, ch4.MolarCp(900), comparer);
+            Assert.Equal(77.92, ch4.MolarCp(1100), comparer);
+            Assert.Equal(90.86, ch4.MolarCp(1500), comparer);
+            Assert.Equal(99.51, ch4.MolarCp(1900), comparer);
+            Assert.Equal(102.83, ch4.MolarCp(2100), comparer);
+            Assert.Equal(108.23, ch4.MolarCp(2500), comparer);
+            Assert.Equal(113.55, ch4.MolarCp(3000), comparer);
         }
 
 
@@ -85,6 +100,20 @@
                     else if (tf.Name.Equals("gasoline_surrogate_therm.dat.txt", StringComparison.OrdinalIgnoreCase)
                         && ex.AllMessages.Count == 1
                         && ex.AllMessages[0].Contains("5806"))
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                    else if (tf.Name.Equals("auutherm.dat.txt", StringComparison.OrdinalIgnoreCase)
+                        && ex.AllMessages.Count == 2
+                        && ex.AllMessages[0].Contains("1774")
+                        && ex.AllMessages[1].Contains("2594"))
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                    else if (tf.Name.Equals("i-pentanol_therm_v33L-cl_release_dat.txt", StringComparison.OrdinalIgnoreCase)
+                        && ex.AllMessages.Count == 2
+                        && ex.AllMessages[0].Contains("2391")
+                        && ex.AllMessages[1].Contains("2471"))
                     {
                         Debug.WriteLine(ex.Message);
                     }

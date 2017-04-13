@@ -5,6 +5,7 @@
     using System.Text;
     using System.Text.RegularExpressions;
     using System;
+    using System.Diagnostics;
 
     public sealed class NasaA7 : NasaA7Base
     {
@@ -49,7 +50,20 @@
 
         public override double ReducedS(double temperature)
         {
-            throw new NotImplementedException();
+            temperature = temperature < 1.0d ? 1.0d : temperature;
+            if (temperature < LowTemperature)
+            {
+                return ReducedS(LowTemperature) + ReducedCp(LowTemperature) * Math.Log(temperature / LowTemperature);
+            }
+
+            if(temperature > HighTemperature)
+            {
+                return ReducedS(HighTemperature) + ReducedCp(HighTemperature) * Math.Log(temperature / HighTemperature);
+            }
+
+            return temperature < CommonTemperature
+                ? LowTemperatureRange.CalcReducedS(temperature)
+                : HighTemperatureRange.CalcReducedS(temperature);
         }
 
         public static NasaA7 Parse(
@@ -134,8 +148,8 @@
             result.HighTemperature = highTemperature.Value;
             result.CommonTemperature = commonTemperature.Value;
 
-            var highTempRange = new double[7];
-            var lowTempRange = new double[7];
+            var highTempRangeArray = new double[7];
+            var lowTempRangeArray = new double[7];
             var coefCaptures = match.Groups["a"].Captures;
             for (int i = 0; i < 14; ++i)
             {
@@ -145,13 +159,13 @@
                 if (formatInfo.IsRealNumber(coefCapture.Value))
                 {
                     var value = formatInfo.ToDouble(coefCapture.Value);
-                    var temp = range == 0 ? highTempRange : lowTempRange;
+                    var temp = range == 0 ? highTempRangeArray : lowTempRangeArray;
                     temp[ordinal] = value;
                 }
             }
 
-            result.HighTemperatureRange = new NasaA7ApproximationRange(highTempRange);
-            result.LowTemperatureRange = new NasaA7ApproximationRange(lowTempRange);
+            var highTempRange= new NasaA7ApproximationRange(highTempRangeArray);
+            var lowTempRange = new NasaA7ApproximationRange(lowTempRangeArray);
 
             var def2 = match.Groups["def2"];
             var def3 = match.Groups["def3"];
@@ -173,6 +187,50 @@
                 string message = messageBuilder.MissingInputEolField(4);
                 diagnosticsCallback.Error(def4, markup, message);
             }
+
+            if (highTemperature == commonTemperature)
+                highTempRange = lowTempRange;
+
+
+            double tcom = result.CommonTemperature;
+            var rebasedHighRange = highTempRange.Rebase(
+                    lowTempRange.CalcReducedCp(tcom),
+                    lowTempRange.CalcReducedH(tcom),
+                    lowTempRange.CalcReducedS(tcom),
+                    tcom
+                );
+
+            var comparer = DoubleEqualityComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 3.0e-2);
+            double lowValue = lowTempRange.CalcReducedCp(tcom);
+            double highValue = highTempRange.CalcReducedCp(tcom);
+
+            if (false == comparer.Equals(lowValue, highValue))
+            {
+                string message = messageBuilder.CpDiscontinuity(result.Header.SpeciesCode, rebasedHighRange.A1, highTempRange.A1);
+                throw new ChemkinIntegrityException(coefCaptures[7], markup, message);
+            }
+
+            lowValue = lowTempRange.CalcReducedH(tcom);
+            highValue = highTempRange.CalcReducedH(tcom);
+
+            if (false == comparer.Equals(lowValue, highValue))
+            {
+                string message = messageBuilder.EnthalpyDiscontinuity(result.Header.SpeciesCode, rebasedHighRange.A6, highTempRange.A6);
+                throw new ChemkinIntegrityException(coefCaptures[12], markup, message);
+            }
+
+
+            lowValue = lowTempRange.CalcReducedS(tcom);
+            highValue = highTempRange.CalcReducedS(tcom);
+
+            if (false == comparer.Equals(lowValue, highValue))
+            {
+                string message = messageBuilder.EntropyDiscontinuity(result.Header.SpeciesCode, rebasedHighRange.A7, highTempRange.A7);
+                throw new ChemkinIntegrityException(coefCaptures[13], markup, message);
+            }
+
+            result.HighTemperatureRange = rebasedHighRange;
+            result.LowTemperatureRange = lowTempRange;
 
             return result;
         }
@@ -219,9 +277,12 @@
             var other = obj as NasaA7;
             if (ReferenceEquals(other, null))
                 return false;
-            return this.Header.Equals(other.Header)
-                && this.HighTemperatureRange.Equals(other.HighTemperatureRange)
-                && this.LowTemperatureRange.Equals(other.LowTemperatureRange);
+            var comparer = DoubleEqualityComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 1.0e-18);
+            return this.Header.Equals(other.Header)                
+                && comparer.Equals(this.LowTemperature, other.LowTemperature)
+                && comparer.Equals(this.CommonTemperature, other.CommonTemperature)
+                && comparer.Equals(this.HighTemperature, other.HighTemperature)
+                && this.LowTemperatureRange.Equals(other.LowTemperatureRange, comparer);
         }        
     }
 }

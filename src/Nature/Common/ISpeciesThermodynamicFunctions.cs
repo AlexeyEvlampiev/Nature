@@ -1,6 +1,6 @@
 ﻿namespace Nature.Common
 {
-    public interface ISpeciesThermo : IChemicalSpeciesInfo
+    public interface ISpeciesThermodynamicFunctions : IChemicalSpeciesInfo
     {
         double ReducedCp(double temperature);
         double ReducedH(double temperature);

@@ -15,5 +15,8 @@ namespace Nature.Chemkin.Thermo
         string MissingHighTemperature();
         string MissingLowTemperature();
         string MissingCommonTemperature();
+        string CpDiscontinuity(string speciesCode, double expectedA1, double actualA1);
+        string EnthalpyDiscontinuity(string speciesCode, double expectedA6, double actualA6);
+        string EntropyDiscontinuity(string speciesCode, double expectedA7, double actualA7);
     }
 }

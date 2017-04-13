@@ -417,6 +417,14 @@ namespace Nature
         /// </remarks>
 		public const double WienDisplacementLawConstant = 2.8977721e-3;
 		 
+		/// <summary>
+        /// Standard state temperature (298.15 [K])
+        /// </summary>
+		/// <remarks>
+		/// wikipedia: Standard state temperature
+        /// </remarks>
+		public const double StandardStateTemperature = 298.15;
+		 
 	}	
 }
 	
