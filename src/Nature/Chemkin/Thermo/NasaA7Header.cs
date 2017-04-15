@@ -18,7 +18,7 @@
 
         public string SpeciesCode { get; private set; }
         public string Tag { get; private set; }
-        public char Phase { get; private set; }
+        public ThermodynamicPhase Phase { get; private set; }
 
         public double? LowTemperature { get; private set; }
         public double? HighTemperature { get; private set; }
@@ -91,15 +91,21 @@
                     messageBuilder.InvalidNasaA7HeaderFormat());
             }
 
+            var classicChemicalFormulaGroup = match.Groups["element"];
+
+            var exceptions = new ChemkinExceptionCollection();
             var speciesCodeAreaGroup = match.Groups["code"];
             var speciesCodeRegex = session.GetOrCreate<Regex>("nasa-a7/header/slement-name/regex",()=> 
                 new Regex(RegexUtils.Minify(@"(?<code>\S+)\s*(?<defect>\S.*\S)?")));
             var speciesCodeMatch = speciesCodeRegex.Match(markup.AdaptedText, speciesCodeAreaGroup);
-            if (!speciesCodeMatch.Success)
-            {
-                throw new ChemkinFormatException(speciesCodeAreaGroup, markup,
-                    messageBuilder.SpeciesCodeIsMissing());
-            }
+            exceptions.TryCatch(()=> {
+                if (!speciesCodeMatch.Success)
+                {
+                    throw new ChemkinFormatException(speciesCodeAreaGroup, markup,
+                        messageBuilder.SpeciesCodeIsMissing());
+                }
+            });
+            
 
             var speciesCodeCapture = speciesCodeMatch.Groups["code"];
             var speciesCodeDefectCapture = speciesCodeMatch.Groups["defect"];
@@ -110,16 +116,25 @@
                     messageBuilder.UnexpectedInputInSpeciesCodeArea(defect));
             }
 
+            string speciesCode = speciesCodeCapture.Value.Trim();
+
             var phaseCapture = match.Groups["phase"];
 
             header.SpeciesCode = speciesCodeCapture.Value;
             header.Tag = match.Groups["date"].Value.Trim();
-            header.Phase = phaseCapture.Value.Single();
-            if (!formatInfo.IsValidPhaseIdentifier(phaseCapture.Value))
+            exceptions.TryCatch(()=> 
             {
-                throw new ChemkinFormatException(phaseCapture, markup,
-                    messageBuilder.InvalidPhaseIdentifier(phaseCapture.Value));
-            }
+                if (formatInfo.IsValidPhaseIdentifier(phaseCapture.Value))
+                {
+                    header.Phase = formatInfo.ParseThermodynamicPhase(phaseCapture.Value);
+                }
+                else
+                {
+                    throw new ChemkinFormatException(phaseCapture, markup,
+                        messageBuilder.InvalidPhaseIdentifier(header.SpeciesCode, phaseCapture.Value));
+                }
+            });
+            
             
             sessionKey = $"chemical-formula/regex/element?{urlParams}";
             r = session.GetOrCreate<Regex>(sessionKey, () => {
@@ -128,18 +143,39 @@
                 return new Regex(pattern);
             });
             var emptyElementRegex = session.GetOrCreate<Regex>("chemical-formula/empty-element/regex", ()=> new Regex(@"^[0\s]+$"));
-            var elementCaptures = match.Groups["element"].Captures;
+            var elementCaptures = classicChemicalFormulaGroup.Captures;
             for (int i = 0; i < elementCaptures.Count; ++i)
             {
                 var c = elementCaptures[i];
                 if (emptyElementRegex.IsMatch(c.Value))
                     continue;
                 var m = r.Match(markup.AdaptedText, c.Index, c.Length);
-                var code = m.Groups["code"].Value.Trim();
-                var content = formatInfo.ToDouble (m.Groups["content"].Value);
+                var elementCodeCapture = m.Groups["code"];                
+                var elementContentCapture = m.Groups["content"];
+                var elementCode = elementCodeCapture.Value.Trim();
+                int errorsCount = exceptions.Count;
+                exceptions.TryCatch(() => {
+                    if (string.IsNullOrWhiteSpace(elementCode))
+                    {
+                        throw new ChemkinFormatException(elementCodeCapture, markup,
+                            messageBuilder.MissingElementCode(speciesCode, i+1));
+                    }
+                });
+                exceptions.TryCatch(()=> {
+                    if (!formatInfo.IsRealNumber(elementContentCapture.Value))
+                    {
+                        throw new ChemkinFormatException(elementContentCapture, markup,
+                            messageBuilder.ExpectedRealNumberElementContent(speciesCode, i+1, elementCode, elementContentCapture.Value.Trim()));
+                    }
+                });
+
+                if (exceptions.Count > errorsCount)
+                    continue;
+
+                var content = formatInfo.ToDouble(elementContentCapture.Value);
                 if (content == 0.0)
                     continue;
-                header._formula.Add(code, content);
+                header._formula.Add(elementCode, content);
             }
 
             if (!string.IsNullOrWhiteSpace(match.Groups["tmin"].Value))
@@ -176,9 +212,9 @@
                 var formulaRegex = session.GetOrCreate<Regex>("chemical-formula/extras/regex", () => 
                 {
                     string pattern = @"
-                        (?:
-                            (?:\s*
-                            (?: (?<code>\w{1,2}) \s* (?<content>@number) )
+                        (?>
+                            (?>\s*
+                            (?> (?<code>\w{1,2}) \s* (?<content>@number) )
                             \s*) |
                             (?<defect>.+ )
                         )*
@@ -196,6 +232,16 @@
                     header._formula.Add(code, content);
                 }
             }
+
+            exceptions.TryCatch(()=> {
+                if (header._formula.Count == 0)
+                {
+                    string message = messageBuilder.MissingChemicalFormula(header.SpeciesCode);
+                    throw new ChemkinFormatException(classicChemicalFormulaGroup.Captures[0], markup, message);
+                }
+            });
+
+            exceptions.ThrowIfNotEmpty();
 
             return header;
         }
@@ -225,8 +271,8 @@
 
             for (int i = 0; i < (options.ElementsMaxCount - printedElements.Count); ++i)
                 sb.AppendFormat(formatProvider, elClassicFormat , string.Empty, string.Empty);
-
-            sb.Append(Phase);
+            
+            sb.Append(Phase.ToString().First());
 
             format = "{0,10}{1,10}{2,8}";
             sb.AppendFormat(formatProvider, format, LowTemperature, HighTemperature, CommonTemperature);

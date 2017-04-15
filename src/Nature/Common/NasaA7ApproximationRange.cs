@@ -33,7 +33,7 @@
         {
             double computedA1 = reducedCp - CalcReducedCp(temperature) + A1;
             var rebased = new NasaA7ApproximationRange(computedA1, A2, A3, A4, A5, A6, A7);
-            Debug.Assert(DoubleEqualityComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 1.0e-8)
+            Debug.Assert(DoubleComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 1.0e-8)
                 .Equals(reducedCp, rebased.CalcReducedCp(temperature)));
             return rebased;
         }
@@ -42,7 +42,7 @@
         {
             double computedA6 = temperature * (reducedH - CalcReducedH(temperature)) + A6;
             var rebased = new NasaA7ApproximationRange(A1, A2, A3, A4, A5, computedA6, A7);
-            Debug.Assert(DoubleEqualityComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 1.0e-8)
+            Debug.Assert(DoubleComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 1.0e-8)
                 .Equals(reducedH, rebased.CalcReducedH(temperature)));
             return rebased;
         }
@@ -51,7 +51,7 @@
         {
             double computedA7 = reducedS - CalcReducedS(temperature) + A7;
             var rebased = new NasaA7ApproximationRange(A1, A2, A3, A4, A5, A6, computedA7);
-            Debug.Assert(DoubleEqualityComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 1.0e-8)
+            Debug.Assert(DoubleComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 1.0e-8)
                 .Equals( reducedS, rebased.CalcReducedS(temperature)));
             return rebased;
         }
@@ -102,7 +102,7 @@
             return A1 * Math.Log(temperature) + A2  * t2 + A3 / 2.0 * t3 + A4 / 3.0 * t4 + A5 / 4.0 * t5 + A7;
         }
 
-        public bool Equals(NasaA7ApproximationRange other, DoubleEqualityComparer comparer)
+        public bool Equals(NasaA7ApproximationRange other, DoubleComparer comparer)
         {
             return
                 comparer.Equals(A1, other.A1)

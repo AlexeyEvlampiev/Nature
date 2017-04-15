@@ -62,6 +62,15 @@ namespace Nature.Chemkin.Thermo {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BIN20      PYRENE       C   0H   0    0    0G   300.000  5000.000 1401.000    01C 12972032H  1622016.
+        /// </summary>
+        internal static string BIN20 {
+            get {
+                return ResourceManager.GetString("BIN20", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CH3CHO            L 8/88C   2H   4O   1     G   200.000  6000.000  1000.000    1.
         /// </summary>
         internal static string CH3CHO {

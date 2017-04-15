@@ -1,20 +1,32 @@
-﻿using System;
-using Nature.Chemkin.Thermo;
-
-namespace Nature.Chemkin
+﻿namespace Nature.Chemkin
 {
-    class DefaultDeserializationContext : 
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Diagnostics;
+    using Nature.Common;    
+
+    public class DefaultDeserializationContext : 
         Thermo.INasaA7HeaderDeserializationContext,
         Thermo.INasaA7DeserializationContext,
         Thermo.IThermoCollectionDeserializationContext
     {
-        readonly IDeserializationDiagnosticsCallack _diagnosticsCallback = new TraceDiagnosticsCallback();
-        readonly Thermo.INasaA7HeaderFormatOptions _chemicalFormulaOptions = new Thermo.NasaA7HeaderFormatOptions();
-        readonly IDeserializationSession _session = new DefaultDeserializationSession();
-        readonly IFormatInfo _formatInfo = new DefaultFormatInfo();
-        readonly DefaultMessageBuilder _messageBuilder = new DefaultMessageBuilder();
+        readonly Stack<object> _services = new Stack<object>();
 
-        
+        public DefaultDeserializationContext()
+        {
+            _services.Push(new DebugDiagnosticsCallback());
+            _services.Push(new Thermo.NasaA7HeaderFormatOptions());
+            _services.Push(new DefaultDeserializationSession());
+            _services.Push(new DefaultFormatInfo());
+            _services.Push(new DefaultMessageBuilder());
+            _services.Push(new DefaultSpeciesThermodynamicFunctionsValidator());
+        }
+
+        [DebuggerStepThrough]
+        public T First<T>() => _services.OfType<T>().First();
+
+        [DebuggerStepThrough]
+        public T FirstOrDefault<T>() => _services.OfType<T>().FirstOrDefault();
 
         public double? DefaultLowTemperature { get; set;}
 
@@ -22,17 +34,23 @@ namespace Nature.Chemkin
 
         public double? DefaultCommonTemperature { get; set; }
 
-        public IDeserializationDiagnosticsCallack GetDiagnosticsCallback() => _diagnosticsCallback;
+        public IDeserializationDiagnosticsCallack GetDiagnosticsCallback() => First<IDeserializationDiagnosticsCallack>();
 
-        Thermo.INasaA7HeaderFormatOptions Thermo.INasaA7HeaderDeserializationContext.GetOptions() => _chemicalFormulaOptions;
+        Thermo.INasaA7HeaderFormatOptions Thermo.INasaA7HeaderDeserializationContext.GetOptions() => First<Thermo.INasaA7HeaderFormatOptions>();
 
-        public IDeserializationSession GetSession() => _session;
+        public IDeserializationSession GetSession() => First<IDeserializationSession>();
 
-        public IFormatInfo GetFormatInfo() => _formatInfo;
+        public IFormatInfo GetFormatInfo() => First<IFormatInfo>();
 
-        Thermo.INasaA7DiagnosticsMessageBuilder Thermo.INasaA7HeaderDeserializationContext.GetMessageBuilder()
+        Thermo.INasaA7DiagnosticsMessageBuilder Thermo.INasaA7HeaderDeserializationContext.GetMessageBuilder() => First<Thermo.INasaA7DiagnosticsMessageBuilder>();
+
+        [DebuggerStepThrough]
+        public void Push(object obj)
         {
-            return _messageBuilder;
+            _services.Push(obj);
         }
+
+        public ISpeciesThermodynamicFunctionsValidator
+            GetSpeciesThermodynamicFunctionsValidator() => First<ISpeciesThermodynamicFunctionsValidator>();
     }
 }

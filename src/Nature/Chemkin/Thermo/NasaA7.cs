@@ -5,7 +5,7 @@
     using System.Text;
     using System.Text.RegularExpressions;
     using System;
-    using System.Diagnostics;
+    using System.Collections.Generic;
 
     public sealed class NasaA7 : NasaA7Base
     {
@@ -93,6 +93,7 @@
             var diagnosticsCallback = context.GetDiagnosticsCallback();
             var formatInfo = context.GetFormatInfo();
             var messageBuilder = context.GetMessageBuilder();
+            var validator = context.GetSpeciesThermodynamicFunctionsValidator();
 
             string urlParams = NasaA7HeaderFormatOptions.BuildUrlParams(options);
             var regex = session.GetOrCreate<Regex>($"nasa-a7-classic/regex?{urlParams}", 
@@ -110,7 +111,7 @@
                     return new Regex(pattern, RegexOptions.Multiline);
                 });
 
-            var result = new NasaA7();
+            
             var match = regex.Match(markup.AdaptedText, index, length);
             if (!match.Success)
             {
@@ -119,38 +120,51 @@
             }
 
             var headerCapture = match.Groups["header"];
+            var coefCaptures = match.Groups["a"].Captures;
+            var header = NasaA7Header.Parse(markup, context, headerCapture);
 
-            result._header = NasaA7Header.Parse(markup, context, headerCapture);
 
-            double? lowTemperature = result._header.LowTemperature ?? context.DefaultLowTemperature;
-            double? highTemperature = result._header.HighTemperature ?? context.DefaultHighTemperature;
-            double? commonTemperature = result._header.CommonTemperature ?? context.DefaultCommonTemperature;
+            double? lowTemperature = header.LowTemperature ?? context.DefaultLowTemperature;
+            double? highTemperature = header.HighTemperature ?? context.DefaultHighTemperature;
+            double? commonTemperature = header.CommonTemperature ?? context.DefaultCommonTemperature;
 
-            if (!lowTemperature.HasValue)
+            var exceptions = new ChemkinExceptionCollection();
+            exceptions.TryCatch(()=> {
+                if (!lowTemperature.HasValue)
+                {
+                    string message = messageBuilder.MissingLowTemperature();
+                    throw new ChemkinIntegrityException(headerCapture, markup, message);
+                }
+            });
+            exceptions.TryCatch(() => {
+                if (!highTemperature.HasValue)
+                {
+                    string message = messageBuilder.MissingHighTemperature();
+                    throw new ChemkinIntegrityException(headerCapture, markup, message);
+                }
+            });
+            exceptions.TryCatch(()=> {
+                if (!commonTemperature.HasValue)
+                {
+                    string message = messageBuilder.MissingCommonTemperature();
+                    throw new ChemkinIntegrityException(headerCapture, markup, message);
+                }
+            });
+
+
+            exceptions.TryCatch(()=> 
             {
-                string message = messageBuilder.MissingLowTemperature();
-                throw new ChemkinIntegrityException(headerCapture, markup, message);
-            }
+                if (lowTemperature > highTemperature || lowTemperature > commonTemperature || commonTemperature > highTemperature)
+                {
+                    string message = messageBuilder.InvalidTemperatureSequence(lowTemperature, commonTemperature, highTemperature);
+                    throw new ChemkinIntegrityException(headerCapture, markup, message);
+                }
+            });
 
-            if (!highTemperature.HasValue)
-            {
-                string message = messageBuilder.MissingHighTemperature();
-                throw new ChemkinIntegrityException(headerCapture, markup, message);
-            }
-
-            if (!commonTemperature.HasValue)
-            {
-                string message = messageBuilder.MissingCommonTemperature();
-                throw new ChemkinIntegrityException(headerCapture, markup, message);
-            }
-
-            result.LowTemperature = lowTemperature.Value;
-            result.HighTemperature = highTemperature.Value;
-            result.CommonTemperature = commonTemperature.Value;
-
+            
             var highTempRangeArray = new double[7];
             var lowTempRangeArray = new double[7];
-            var coefCaptures = match.Groups["a"].Captures;
+            
             for (int i = 0; i < 14; ++i)
             {
                 var coefCapture = coefCaptures[i];
@@ -192,7 +206,7 @@
                 highTempRange = lowTempRange;
 
 
-            double tcom = result.CommonTemperature;
+            double tcom = commonTemperature.Value;
             var rebasedHighRange = highTempRange.Rebase(
                     lowTempRange.CalcReducedCp(tcom),
                     lowTempRange.CalcReducedH(tcom),
@@ -200,37 +214,62 @@
                     tcom
                 );
 
-            var comparer = DoubleEqualityComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 3.0e-2);
-            double lowValue = lowTempRange.CalcReducedCp(tcom);
-            double highValue = highTempRange.CalcReducedCp(tcom);
+            exceptions.ThrowIfNotEmpty();
 
-            if (false == comparer.Equals(lowValue, highValue))
-            {
-                string message = messageBuilder.CpDiscontinuity(result.Header.SpeciesCode, rebasedHighRange.A1, highTempRange.A1);
-                throw new ChemkinIntegrityException(coefCaptures[7], markup, message);
-            }
+            var comparer = DoubleComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 3.0e-2);
+            exceptions.TryCatch(()=> {
+                double lowValue = lowTempRange.CalcReducedCp(tcom);
+                double highValue = highTempRange.CalcReducedCp(tcom);
+                if (false == comparer.Equals(lowValue, highValue))
+                {
+                    string message = messageBuilder.HeatCapacityDiscontinuity(header.SpeciesCode, rebasedHighRange.A1, highTempRange.A1);
+                    throw new ChemkinIntegrityException(coefCaptures[7], markup, message);
+                }
+            });
 
-            lowValue = lowTempRange.CalcReducedH(tcom);
-            highValue = highTempRange.CalcReducedH(tcom);
+            exceptions.TryCatch(() => {
+                double lowValue = lowTempRange.CalcReducedH(tcom);
+                double highValue = highTempRange.CalcReducedH(tcom);
+                if (false == comparer.Equals(lowValue, highValue))
+                {
+                    string message = messageBuilder.EnthalpyDiscontinuity(header.SpeciesCode, rebasedHighRange.A6, highTempRange.A6);
+                    throw new ChemkinIntegrityException(coefCaptures[12], markup, message);
+                }
+            });
 
-            if (false == comparer.Equals(lowValue, highValue))
-            {
-                string message = messageBuilder.EnthalpyDiscontinuity(result.Header.SpeciesCode, rebasedHighRange.A6, highTempRange.A6);
-                throw new ChemkinIntegrityException(coefCaptures[12], markup, message);
-            }
+            exceptions.TryCatch(() => {
+                double lowValue = lowTempRange.CalcReducedS(tcom);
+                double highValue = highTempRange.CalcReducedS(tcom);
+                if (false == comparer.Equals(lowValue, highValue))
+                {
+                    string message = messageBuilder.EntropyDiscontinuity(header.SpeciesCode, rebasedHighRange.A7, highTempRange.A7);
+                    throw new ChemkinIntegrityException(coefCaptures[13], markup, message);
+                }
+            });
 
 
-            lowValue = lowTempRange.CalcReducedS(tcom);
-            highValue = highTempRange.CalcReducedS(tcom);
+            exceptions.ThrowIfNotEmpty();
 
-            if (false == comparer.Equals(lowValue, highValue))
-            {
-                string message = messageBuilder.EntropyDiscontinuity(result.Header.SpeciesCode, rebasedHighRange.A7, highTempRange.A7);
-                throw new ChemkinIntegrityException(coefCaptures[13], markup, message);
-            }
-
+            var result = new NasaA7();
+            result._header = header;
+            result.LowTemperature = lowTemperature.Value;
+            result.HighTemperature = highTemperature.Value;
+            result.CommonTemperature = commonTemperature.Value;
             result.HighTemperatureRange = rebasedHighRange;
             result.LowTemperatureRange = lowTempRange;
+
+            exceptions.TryCatch(() => {
+                var errors = new List<string>();
+                validator.Validate(result, onError: (msg)=> errors.Add(msg));
+                if (errors.Count > 0)
+                {
+                    string message = messageBuilder
+                    .FunctionasValidationFailed(header.SpeciesCode, errors);
+                    throw new ChemkinDataValidationException(headerCapture, markup, message);
+                }
+            });
+
+            exceptions.ThrowIfNotEmpty();
 
             return result;
         }
@@ -272,17 +311,26 @@
             return result;
         }
 
-        public override bool Equals(object obj)
+        public bool Equals(object obj, DoubleComparer comparer)
         {
             var other = obj as NasaA7;
             if (ReferenceEquals(other, null))
                 return false;
-            var comparer = DoubleEqualityComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 1.0e-18);
-            return this.Header.Equals(other.Header)                
+            return this.Header.Equals(other.Header)
                 && comparer.Equals(this.LowTemperature, other.LowTemperature)
                 && comparer.Equals(this.CommonTemperature, other.CommonTemperature)
                 && comparer.Equals(this.HighTemperature, other.HighTemperature)
                 && this.LowTemperatureRange.Equals(other.LowTemperatureRange, comparer);
-        }        
+        }
+
+        public override bool Equals(object obj)
+        {
+            var comparer = DoubleComparer.FromAbsoluteAndRelativeTolerances(1.0e-8, 1.0e-8);
+            return this.Equals(obj, comparer);
+        }
+
+        protected override double GetMinTemperature() => LowTemperature;
+
+        protected override double GetMaxTemperature() => HighTemperature;
     }
 }

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace Nature.Chemkin
+﻿namespace Nature.Chemkin
 {
-    public class TraceDiagnosticsCallback : IDeserializationDiagnosticsCallack
+    using System.Diagnostics;
+    using System.Text.RegularExpressions;
+
+    public class DebugDiagnosticsCallback : IDeserializationDiagnosticsCallack
     {
         public void Error(Capture capture, ChemkinMarkup markup, string message)
         {

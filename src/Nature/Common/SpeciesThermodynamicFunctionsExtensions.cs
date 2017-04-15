@@ -1,9 +1,5 @@
 ﻿namespace Nature.Common
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
     public static class SpeciesThermodynamicFunctionsExtensions
     {
         public static double H(this ISpeciesThermodynamicFunctions self, double temperature) => MolarEnthalpy(self, temperature);

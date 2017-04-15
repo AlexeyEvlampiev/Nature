@@ -1,20 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace Nature.Chemkin
+﻿namespace Nature.Chemkin
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Text.RegularExpressions;
+    using Nature.Common;
     public class DefaultFormatInfo : IFormatInfo
     {
         private readonly Regex m_elementIdRegex;
         private readonly Regex m_realNumberRegex;
 
-        private readonly HashSet<string> m_phaseIdentifiers 
-            = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        private readonly Dictionary<string, ThermodynamicPhase> m_phaseIdentifiers 
+            = new Dictionary<string, ThermodynamicPhase>(StringComparer.OrdinalIgnoreCase)
             {
-                "G", "L", "S"
+                { "G", ThermodynamicPhase.Gas},
+                { "L", ThermodynamicPhase.Liquid },
+                { "S", ThermodynamicPhase.Solid }
             };
 
         public DefaultFormatInfo()
@@ -45,7 +46,19 @@ namespace Nature.Chemkin
 
         public bool IsValidPhaseIdentifier(string phaseId)
         {
-            return this.m_phaseIdentifiers.Contains(phaseId);
+            return this.m_phaseIdentifiers.ContainsKey(phaseId);
+        }
+
+        public ThermodynamicPhase ParseThermodynamicPhase(string phaseId)
+        {
+            try
+            {
+                return m_phaseIdentifiers[phaseId];
+            }
+            catch(KeyNotFoundException)
+            {
+                throw new FormatException();
+            }
         }
     }
 }

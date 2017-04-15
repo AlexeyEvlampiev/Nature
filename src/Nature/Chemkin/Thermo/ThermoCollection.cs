@@ -1,13 +1,14 @@
-﻿using Nature.Common;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-namespace Nature.Chemkin.Thermo
+﻿namespace Nature.Chemkin.Thermo
 {
+    using Nature.Common;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+
+
     public sealed class ThermoCollection : IReadOnlyList<object>
     {
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
@@ -112,26 +113,19 @@ namespace Nature.Chemkin.Thermo
                 });
 
             var collection = new ThermoCollection();
-            var exceptions = new List<ChemkinException>();
+            var exceptions = new ChemkinExceptionCollection();
             for (Match itemMatch = bodyRegex.Match(markup.AdaptedText, body.Index, body.Length);
                 itemMatch.Success;
                 itemMatch = itemMatch.NextMatch())
             {
-                try
+                exceptions.TryCatch(()=> 
                 {
                     var classic = NasaA7.Parse(markup, context, itemMatch);
                     collection._items.Add(classic);
-                }
-                catch (ChemkinException ex)
-                {
-                    exceptions.Add(ex);
-                }
+                });
             }
 
-            if (exceptions.Any())
-            {
-                throw ChemkinException.Aggregate(exceptions);
-            }
+            exceptions.ThrowIfNotEmpty();
 
             return collection;
         }
