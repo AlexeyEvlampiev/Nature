@@ -1,0 +1,86 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension="generated.cs" #>
+
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="Microsoft.CSharp" #>
+
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Configuration" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Xml.Serialization" #>
+<#@ import namespace="System.Diagnostics" #>
+<#
+	var elements = Elements.Load(Host.ResolvePath(@"ChemicalElementInfo.xml")).Items;
+    		
+ #>
+namespace Nature
+{
+	using System.Diagnostics;
+
+	[DebuggerDisplay("{Name} ({Code}): {Mass}")]
+	public struct ChemicalElementInfo
+	{
+		public readonly string Code;
+		public readonly string Name;
+		public readonly double Mass;
+
+		public ChemicalElementInfo(string code, string name, double mass) : this() 
+		{
+			Code = code;
+			Name = name;
+			Mass = mass;
+		}
+
+		public override int GetHashCode() => Code.GetHashCode();
+
+		public static ChemicalElementInfo[] GetChemicalElements()
+		{
+			return new ChemicalElementInfo[]
+			{<# foreach(var el in elements ){ #> 
+				new ChemicalElementInfo("<#= el.Code #>", "<#= el.Name #>", <#= el.Mass #>),  <# } #> 
+			};
+		}
+	}		
+}
+	<#+ 
+
+	[XmlRoot("elements")]
+	public class Elements
+	{
+		public class Item
+		{
+			[XmlAttribute()]
+			public string Code { get; set; }
+			[XmlAttribute()]
+			public string Name { get; set; }
+			[XmlAttribute()]
+			public double Mass { get; set; }
+			[XmlAttribute()]
+			public double Valency { get; set; }			
+		}
+
+		[XmlElement("element")]
+		public Item[] Items { get; set; }
+
+		public static Elements Load(string path)
+		{
+			var dslFile = new FileInfo(path);
+			if(dslFile.Exists == false)			
+				throw new FileNotFoundException(dslFile.FullName);
+			
+			using(var stream = File.OpenRead(dslFile.FullName))			
+            {
+				var items = (Elements)(new XmlSerializer(typeof(Elements)).Deserialize(stream));		
+				return items;
+			}
+		}
+
+	}
+			
+	#>

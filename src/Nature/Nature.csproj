@@ -9,6 +9,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="ChemicalElementInfo.generated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ChemicalElementInfo.tt</DependentUpon>
+    </Compile>
     <Compile Update="Chemkin\ChemkinPatterns.generated.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -22,6 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ChemicalElementInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ChemicalElementInfo.generated.cs</LastGenOutput>
+    </None>
     <None Update="Chemkin\ChemkinPatterns.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ChemkinPatterns.generated.cs</LastGenOutput>
