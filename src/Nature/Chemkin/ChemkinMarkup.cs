@@ -1,17 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace Nature.Chemkin
+﻿namespace Nature.Chemkin
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Net.Http;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+
     public class ChemkinMarkup
     {        
         readonly Lazy<TextPosition[]> _positions;
 
+        public static async Task<ChemkinMarkup> CreateAsync(string resource)
+        {
+            if (File.Exists(resource))
+            {
+                var info = new FileInfo(resource);
+                using (var reader = info.OpenText())
+                {
+                    string markup = await reader.ReadToEndAsync().ConfigureAwait(false);
+                    return new ChemkinMarkup(info.Name, markup);
+                }
+            }
+            else if (Uri.IsWellFormedUriString(resource, UriKind.Absolute))
+            {
+                var uri = new Uri(resource);
+                var httpClient = new HttpClient();
+                string markup = await httpClient.GetStringAsync(resource).ConfigureAwait(false);
+                return new ChemkinMarkup(uri.LocalPath, markup);
+            }
+            else
+            {
+                return new ChemkinMarkup(resource);
+            }
+        }
+
+        public IEnumerable<object> Parse()
+        {
+            var heap = new List<object>();
+            var context = new DefaultDeserializationContext();
+            var regex = new Regex(RegexUtils.MinifyStrict(@"
+                \s* 
+                    (?<thermo>\bTHERMO?\b.*)
+            "), RegexOptions.Singleline);
+            var match = regex.Match(AdaptedText);
+            foreach (Capture capture in match.Captures)
+            {
+                var collection = Thermo.ThermoCollection.Parse(this, context, capture);
+                heap.AddRange(collection);
+            }
+
+            return heap;
+        }
+
         public ChemkinMarkup(string text) 
             : this($"text:{Guid.NewGuid()}", text)
-        { }
+        {
+        }
         
         public ChemkinMarkup(string id, string text)
         {

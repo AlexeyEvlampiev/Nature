@@ -1,0 +1,11 @@
+﻿<IdealGasState>
+  <Scalars>
+    <Add Name="Temperature" CompositionDependent="true" />
+    <Add Name="Pressure" CompositionDependent="true" />
+    <Add Name="MolarMass" CompositionDependent="true" />
+  </Scalars>
+  <Arrays>
+    <Add Length="NumberOfSpecies" Name="SpeciesMassFractions" CompositionDependent="true"  />
+    <Add Length="NumberOfSpecies" Name="SpeciesMoleFractions" CompositionDependent="true"  />
+  </Arrays>
+</IdealGasState>

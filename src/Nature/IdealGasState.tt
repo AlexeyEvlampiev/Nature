@@ -1,0 +1,167 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension="generated.cs" #>
+
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="Microsoft.CSharp" #>
+
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Configuration" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Xml.Serialization" #>
+<#@ import namespace="System.Diagnostics" #>
+<#
+	var igs = IdealGasState.Load(Host.ResolvePath(@"IdealGasState.xml"));
+    		
+ #>
+namespace Nature
+{
+	using System.Diagnostics;
+
+	public partial class IdealGasState
+	{
+		#region Private Fields<# foreach(var scalar in igs.Scalars){ #> 
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double <#= scalar.FieldName #>; <# } #> 
+		<# foreach(var array in igs.Arrays){ #> 
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double[] <#= array.FieldName #>; <# } #> 
+
+		<# foreach(var item in igs.Items){ #> 
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool <#= item.IsReady #>; <# } #> 
+		#endregion		
+
+		#region Partial Methods<# foreach(var item in igs.Items){ #> 
+		partial void On<#= item.Name#>Changed(); <# } #> 
+		#endregion	
+
+		private void DropState()
+		{<# foreach(var item in igs.Items){ #> 
+			<#= item.IsReady #> = false; <# } #>  
+		}
+
+
+		<# foreach(var scalar in igs.Scalars){ #> 
+		public double <#= scalar.Name #>
+		{
+			[DebuggerStepThrough]
+			get
+			{
+				if(<#= scalar.IsReady #>)
+					return <#= scalar.FieldName #>;
+				<#= scalar.FieldName #> = Calculate<#= scalar.Name #>();
+				<#= scalar.IsReady #> = true;
+				return <#= scalar.FieldName #>;
+			}
+			[DebuggerStepThrough]
+			private set
+			{
+				<#= scalar.FieldName #> = value;
+				<#= scalar.IsReady #> = true;
+				On<#= scalar.Name#>Changed(); 
+			}
+		}
+		<# } #> 
+
+		<# foreach(var array in igs.Arrays){ #>
+		
+		public ReadOnlyArray<double> <#= array.Name #>
+		{
+			[DebuggerStepThrough]
+			get
+			{
+				if(<#= array.FieldName #> == null)
+				{
+					<#= array.FieldName #> = new double[_model.<#= array.Length #>];
+					<#= array.IsReady #> = false;
+				}
+
+				if(!<#= array.IsReady #>)
+				{
+					this.Calculate<#= array.Name #>(<#= array.FieldName#>);
+					<#= array.IsReady #> = true;
+				}
+
+				return <#= array.FieldName #>;
+			}
+			[DebuggerStepThrough]
+			private set
+			{
+				if(<#= array.FieldName #> == null)
+				{
+					<#= array.FieldName #> = new double[_model.<#= array.Length #>];					
+				}
+				else if(<#= array.FieldName #> == value.Data)
+				{
+					<#= array.IsReady #> = true;
+					return;
+				}
+
+				for(int i = 0; i < <#= array.FieldName #>.Length; ++i)
+				{
+					<#= array.FieldName #>[i] = value[i];
+				}
+
+				<#= array.IsReady #> = true;
+				On<#= array.Name#>Changed(); 
+			}
+		}
+
+		<# } #> 
+	}
+	
+}
+	<#+ 
+
+	[XmlRoot("IdealGasState")]
+	public class IdealGasState
+	{
+		public abstract class Item
+		{
+			[XmlAttribute()]
+			public string Name { get; set; }
+
+			[XmlAttribute()]
+			public bool CompositionDependent { get; set; }
+
+			[XmlAttribute()]
+			public bool TemperatureDependent { get; set; }
+
+			public string FieldName { get { return Regex.Replace(Name, @"^.", m=> "_" + m.Value.ToLower()); } }
+			public string IsReady { get { return string.Format("_has{0}", Name); } }
+		}
+
+		public class ScalarItem : Item{}
+
+		public class ArrayItem : Item
+		{
+			[XmlAttribute()]
+			public string Length { get; set; }
+		}
+		
+		[XmlArray("Scalars"), XmlArrayItem("Add")]
+		public ScalarItem[] Scalars { get; set; }
+		[XmlArray("Arrays"), XmlArrayItem("Add")]
+		public ArrayItem[] Arrays { get; set; }
+
+		public IEnumerable<Item> Items { get { return Scalars.OfType<Item>().Union(Arrays); } }
+
+		public static IdealGasState Load(string path)
+		{
+			var dslFile = new FileInfo(path);
+			if(dslFile.Exists == false)			
+				throw new FileNotFoundException(dslFile.FullName);
+			
+			using(var stream = File.OpenRead(dslFile.FullName))			
+            {
+				var items = (IdealGasState)(new XmlSerializer(typeof(IdealGasState)).Deserialize(stream));		
+				return items;
+			}
+		}
+
+	}
+			
+	#>

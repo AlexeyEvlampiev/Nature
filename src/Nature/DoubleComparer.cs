@@ -53,6 +53,20 @@
             return false;
         }
 
+        public bool Equals(ReadOnlyArray<double> x, ReadOnlyArray<double> y)
+        {
+            if (ReferenceEquals(x.Data, y.Data))
+                return true;
+            if (x.Length != y.Length)
+                return false;
+            for (int i = 0; i < x.Length; ++i)
+            {
+                if (!this.Equals(x[i], y[i]))
+                    return false;
+            }
+
+            return true;
+        }
        
 
         [DebuggerNonUserCode]

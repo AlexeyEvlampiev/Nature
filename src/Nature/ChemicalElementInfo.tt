@@ -45,7 +45,12 @@ namespace Nature
 			{<# foreach(var el in elements ){ #> 
 				new ChemicalElementInfo("<#= el.Code #>", "<#= el.Name #>", <#= el.Mass #>),  <# } #> 
 			};
-		}
+		} <# foreach(var el in elements){ #> 
+
+		/// <summary>
+        /// <#= el.Name #> (<#= el.Code #>)
+        /// </summary>
+		public static ChemicalElementInfo <#= el.Code #> => new ChemicalElementInfo("<#= el.Code #>", "<#= el.Name #>", <#= el.Mass #>); <# } #> 
 	}		
 }
 	<#+ 
