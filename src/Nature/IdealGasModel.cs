@@ -69,5 +69,30 @@
         public int GetSpeciesOrdinal(string speciesCode) => _ixSpeciesOrdynalByCode[speciesCode];
 
         public bool IsSpeciesCode(string speciesCode) => _ixSpeciesOrdynalByCode.ContainsKey(speciesCode);
+
+
+        public T[] AllocateSpeciesArray<T>() => new T[NumberOfSpecies];
+
+        public void SetSpecies<T>(string speciesCode, T[] array, T value)
+        {
+            if (array == null)
+                throw new ArgumentNullException(nameof(array));
+            if (speciesCode == null)
+                throw new ArgumentNullException(nameof(speciesCode));
+            if (array.Length != _numberOfSpecies)
+                throw new ArgumentException();
+            int ordinal = _ixSpeciesOrdynalByCode[speciesCode];
+            array[ordinal] = value;
+        }
+
+        public T GetSpecies<T>(string speciesCode, ReadOnlyArray<T> array)
+        {
+            if (array.Data == null)
+                throw new ArgumentNullException(nameof(array));
+            if (speciesCode == null)
+                throw new ArgumentNullException(nameof(speciesCode));
+            int ordinal = _ixSpeciesOrdynalByCode[speciesCode];
+            return array[ordinal];
+        }
     }
 }

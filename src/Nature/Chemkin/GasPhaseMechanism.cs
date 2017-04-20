@@ -12,6 +12,12 @@
         {
         }
 
+        public static async Task<GasPhaseMechanism> CreateAsync(string resource, CancellationToken token)
+        {
+            var heap = await GetHeapAsync(resource, token);
+            return new GasPhaseMechanism(heap);
+        }
+
         public static async Task<GasPhaseMechanism> CreateAsync(
             IEnumerable<string> resources, 
             CancellationToken token)

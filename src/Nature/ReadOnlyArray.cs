@@ -88,6 +88,21 @@
         }
 
 
+        public void CopyTo(ref T[] array)
+        {
+            T[] target = array;
+            if (target == null || target.Length != m_array.Length)
+            {
+                array = target = new T[m_array.Length];
+            }
+
+            for (int i = 0; i < m_array.Length; ++i)
+            {
+                target[i] = m_array[i];
+            }
+        }
+
+
         #region IEnumerable<T> Members
 
         /// <summary>
@@ -118,36 +133,7 @@
 
         #endregion
 
-    }
-
-
-    public static partial class ITolerance
-    {
-        /// <summary>
-        /// Copies content of this ReadOnlyArray instance into the target array
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source">Source array (readonly)</param>
-        /// <param name="target">Traget array</param>
-        public static void CopyTo<T>(this ReadOnlyArray<T> source, T[] target)
-        {
-            Debug.Assert(source.Length == target.Length);
-            for (int i = 0; i < source.Length; ++i) { target[i] = source[i]; }
-        }
-
-        /// <summary>
-        /// Copies content of this ReadOnlyArray instance into the target array
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source">Source array (readonly)</param>
-        /// <param name="target">Traget array</param>
-        public static void CopyTo(this ReadOnlyArray<double> source, decimal[] target)
-        {
-            Debug.Assert(source.Length == target.Length);
-            for (int i = 0; i < source.Length; ++i) { target[i] = (decimal)source[i]; }
-        }
-    }
-
+    }   
 }
 
 

@@ -10,6 +10,8 @@ namespace Nature
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double _temperature;  
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double _pressure;  
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double _molarMass;  
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double _molarDensity;  
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double _massDensity;  
 		 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double[] _speciesMassFractions;  
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double[] _speciesMoleFractions;  
@@ -18,6 +20,8 @@ namespace Nature
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool _hasTemperature;  
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool _hasPressure;  
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool _hasMolarMass;  
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool _hasMolarDensity;  
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool _hasMassDensity;  
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool _hasSpeciesMassFractions;  
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool _hasSpeciesMoleFractions;  
 		#endregion		
@@ -26,6 +30,8 @@ namespace Nature
 		partial void OnTemperatureChanged();  
 		partial void OnPressureChanged();  
 		partial void OnMolarMassChanged();  
+		partial void OnMolarDensityChanged();  
+		partial void OnMassDensityChanged();  
 		partial void OnSpeciesMassFractionsChanged();  
 		partial void OnSpeciesMoleFractionsChanged();  
 		#endregion	
@@ -35,6 +41,8 @@ namespace Nature
 			_hasTemperature = false;  
 			_hasPressure = false;  
 			_hasMolarMass = false;  
+			_hasMolarDensity = false;  
+			_hasMassDensity = false;  
 			_hasSpeciesMassFractions = false;  
 			_hasSpeciesMoleFractions = false;   
 		}
@@ -101,6 +109,46 @@ namespace Nature
 			}
 		}
 		 
+		public double MolarDensity
+		{
+			[DebuggerStepThrough]
+			get
+			{
+				if(_hasMolarDensity)
+					return _molarDensity;
+				_molarDensity = CalculateMolarDensity();
+				_hasMolarDensity = true;
+				return _molarDensity;
+			}
+			[DebuggerStepThrough]
+			private set
+			{
+				_molarDensity = value;
+				_hasMolarDensity = true;
+				OnMolarDensityChanged(); 
+			}
+		}
+		 
+		public double MassDensity
+		{
+			[DebuggerStepThrough]
+			get
+			{
+				if(_hasMassDensity)
+					return _massDensity;
+				_massDensity = CalculateMassDensity();
+				_hasMassDensity = true;
+				return _massDensity;
+			}
+			[DebuggerStepThrough]
+			private set
+			{
+				_massDensity = value;
+				_hasMassDensity = true;
+				OnMassDensityChanged(); 
+			}
+		}
+		 
 
 				
 		public ReadOnlyArray<double> SpeciesMassFractions
@@ -108,18 +156,7 @@ namespace Nature
 			[DebuggerStepThrough]
 			get
 			{
-				if(_speciesMassFractions == null)
-				{
-					_speciesMassFractions = new double[_model.NumberOfSpecies];
-					_hasSpeciesMassFractions = false;
-				}
-
-				if(!_hasSpeciesMassFractions)
-				{
-					this.CalculateSpeciesMassFractions(_speciesMassFractions);
-					_hasSpeciesMassFractions = true;
-				}
-
+				CalculateSpeciesMassFractions();
 				return _speciesMassFractions;
 			}
 			[DebuggerStepThrough]
@@ -151,18 +188,7 @@ namespace Nature
 			[DebuggerStepThrough]
 			get
 			{
-				if(_speciesMoleFractions == null)
-				{
-					_speciesMoleFractions = new double[_model.NumberOfSpecies];
-					_hasSpeciesMoleFractions = false;
-				}
-
-				if(!_hasSpeciesMoleFractions)
-				{
-					this.CalculateSpeciesMoleFractions(_speciesMoleFractions);
-					_hasSpeciesMoleFractions = true;
-				}
-
+				CalculateSpeciesMoleFractions();
 				return _speciesMoleFractions;
 			}
 			[DebuggerStepThrough]
@@ -189,7 +215,39 @@ namespace Nature
 		}
 
 		 
-	}
-	
+
+
+		  
+		private void CalculateSpeciesMassFractions()
+		{
+			if(_speciesMassFractions == null)
+			{
+				_speciesMassFractions = new double[_model.NumberOfSpecies];
+				_hasSpeciesMassFractions = false;
+			}
+
+			if(!_hasSpeciesMassFractions)
+			{
+				this.CalculateSpeciesMassFractions(_speciesMassFractions);
+				_hasSpeciesMassFractions = true;
+			}
+		}
+		  
+		private void CalculateSpeciesMoleFractions()
+		{
+			if(_speciesMoleFractions == null)
+			{
+				_speciesMoleFractions = new double[_model.NumberOfSpecies];
+				_hasSpeciesMoleFractions = false;
+			}
+
+			if(!_hasSpeciesMoleFractions)
+			{
+				this.CalculateSpeciesMoleFractions(_speciesMoleFractions);
+				_hasSpeciesMoleFractions = true;
+			}
+		}
+		 
+	}	
 }
 	

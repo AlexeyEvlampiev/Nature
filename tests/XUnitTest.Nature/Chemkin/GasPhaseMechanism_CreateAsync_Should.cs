@@ -9,7 +9,7 @@
         [Fact]
         public async Task WorkAsync()
         {
-            string[] resources = new string[] { Thermo.ThermoCollectionsResource.thermo30};
+            string[] resources = new string[] { Thermo.ThermoCollectionsResource.thermo30 };
             var mechanism = await GasPhaseMechanism.CreateAsync(resources, CancellationToken.None);
             var state = new IdealGasState(mechanism);
 

@@ -31,7 +31,7 @@ namespace Nature
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] double[] <#= array.FieldName #>; <# } #> 
 
 		<# foreach(var item in igs.Items){ #> 
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool <#= item.IsReady #>; <# } #> 
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)] bool <#= item.HasValue #>; <# } #> 
 		#endregion		
 
 		#region Partial Methods<# foreach(var item in igs.Items){ #> 
@@ -40,7 +40,7 @@ namespace Nature
 
 		private void DropState()
 		{<# foreach(var item in igs.Items){ #> 
-			<#= item.IsReady #> = false; <# } #>  
+			<#= item.HasValue #> = false; <# } #>  
 		}
 
 
@@ -50,17 +50,17 @@ namespace Nature
 			[DebuggerStepThrough]
 			get
 			{
-				if(<#= scalar.IsReady #>)
+				if(<#= scalar.HasValue #>)
 					return <#= scalar.FieldName #>;
 				<#= scalar.FieldName #> = Calculate<#= scalar.Name #>();
-				<#= scalar.IsReady #> = true;
+				<#= scalar.HasValue #> = true;
 				return <#= scalar.FieldName #>;
 			}
 			[DebuggerStepThrough]
 			private set
 			{
 				<#= scalar.FieldName #> = value;
-				<#= scalar.IsReady #> = true;
+				<#= scalar.HasValue #> = true;
 				On<#= scalar.Name#>Changed(); 
 			}
 		}
@@ -73,18 +73,7 @@ namespace Nature
 			[DebuggerStepThrough]
 			get
 			{
-				if(<#= array.FieldName #> == null)
-				{
-					<#= array.FieldName #> = new double[_model.<#= array.Length #>];
-					<#= array.IsReady #> = false;
-				}
-
-				if(!<#= array.IsReady #>)
-				{
-					this.Calculate<#= array.Name #>(<#= array.FieldName#>);
-					<#= array.IsReady #> = true;
-				}
-
+				Calculate<#= array.Name #>();
 				return <#= array.FieldName #>;
 			}
 			[DebuggerStepThrough]
@@ -96,7 +85,7 @@ namespace Nature
 				}
 				else if(<#= array.FieldName #> == value.Data)
 				{
-					<#= array.IsReady #> = true;
+					<#= array.HasValue #> = true;
 					return;
 				}
 
@@ -105,14 +94,31 @@ namespace Nature
 					<#= array.FieldName #>[i] = value[i];
 				}
 
-				<#= array.IsReady #> = true;
+				<#= array.HasValue #> = true;
 				On<#= array.Name#>Changed(); 
 			}
 		}
 
 		<# } #> 
-	}
-	
+
+
+		<# foreach(var array in igs.Arrays){ #>  
+		private void Calculate<#= array.Name#>()
+		{
+			if(<#= array.FieldName #> == null)
+			{
+				<#= array.FieldName #> = new double[_model.<#= array.Length #>];
+				<#= array.HasValue #> = false;
+			}
+
+			if(!<#= array.HasValue #>)
+			{
+				this.Calculate<#= array.Name #>(<#= array.FieldName#>);
+				<#= array.HasValue #> = true;
+			}
+		}
+		<# } #> 
+	}	
 }
 	<#+ 
 
@@ -125,13 +131,12 @@ namespace Nature
 			public string Name { get; set; }
 
 			[XmlAttribute()]
-			public bool CompositionDependent { get; set; }
-
-			[XmlAttribute()]
-			public bool TemperatureDependent { get; set; }
+			public bool TemperatureOnlyDependency { get; set; }
+			
 
 			public string FieldName { get { return Regex.Replace(Name, @"^.", m=> "_" + m.Value.ToLower()); } }
-			public string IsReady { get { return string.Format("_has{0}", Name); } }
+			public string VariableName { get { return Regex.Replace(Name, @"^.", m=> m.Value.ToLower()); } }
+			public string HasValue { get { return string.Format("_has{0}", Name); } }
 		}
 
 		public class ScalarItem : Item{}

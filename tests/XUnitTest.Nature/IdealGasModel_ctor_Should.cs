@@ -3,7 +3,7 @@
     using Nature.Chemkin.Thermo;
     using Xunit;
 
-    public class IdealGasMixtureModel_ctor_Should
+    public class IdealGasModel_ctor_Should
     {
         [Fact]
         public void Work()

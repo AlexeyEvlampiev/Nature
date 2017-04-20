@@ -1,11 +1,13 @@
-﻿<IdealGasState>
+﻿<IdealGasState  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="IdealGasState.xsd">
   <Scalars>
-    <Add Name="Temperature" CompositionDependent="true" />
-    <Add Name="Pressure" CompositionDependent="true" />
-    <Add Name="MolarMass" CompositionDependent="true" />
+    <Add Name="Temperature" DependencyType="Complex" />
+    <Add Name="Pressure" DependencyType="Complex" />
+    <Add Name="MolarMass" DependencyType="Composition" />
+    <Add Name="MolarDensity" DependencyType="Complex" />
+    <Add Name="MassDensity" DependencyType="Complex" />
   </Scalars>
   <Arrays>
-    <Add Length="NumberOfSpecies" Name="SpeciesMassFractions" CompositionDependent="true"  />
-    <Add Length="NumberOfSpecies" Name="SpeciesMoleFractions" CompositionDependent="true"  />
+    <Add Length="NumberOfSpecies" Name="SpeciesMassFractions" DependencyType="Composition"  />
+    <Add Length="NumberOfSpecies" Name="SpeciesMoleFractions" DependencyType="Composition"  />
   </Arrays>
 </IdealGasState>
