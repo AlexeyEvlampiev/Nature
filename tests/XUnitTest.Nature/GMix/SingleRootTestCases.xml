@@ -1,0 +1,105 @@
+﻿<SingleRootTestCases  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SingleRootTestCases.xsd">
+  <Add>
+    <Description> </Description>
+    <Script>
+      C3H8 = 0.1
+      O2 = ?
+    </Script>
+    <Projections>
+      <Add TPX="T = 298.15; P = 1.0e+5; C3H8 = 0.1; O2 = 0.9" />
+    </Projections>
+  </Add>
+  <Add>
+    <Description> </Description>
+    <Script>
+      units = [mass fractions, kelvins, atmospheres]
+      C3H8 = 0.1
+      O2 = ?
+      temperature = 300
+      pressure = 10
+    </Script>
+    <Projections>
+      <Add TPX="T = 298.15; P = 1.0e+5; C3H8 = 0.1; O2 = 0.9" />
+    </Projections>
+  </Add>
+  <Add>
+    <Description> </Description>
+    <Script>
+      units = [mass fractions]
+      C3H8 = 0.1
+      O2 = ?
+      temperature = 300K
+      pressure = 10atm
+    </Script>
+    <Projections>
+      <Add TPX="T = 298.15; P = 1.0e+5; C3H8 = 0.1; O2 = 0.9" />
+    </Projections>
+  </Add>
+  <Add>
+    <Description> </Description>
+    <Script>
+      C3H8 = [0.1, 0.2, 0.3]
+      O2 = ?
+    </Script>
+    <Projections>
+      <Add TPX="T = 298.15; P = 1.0e+5; C3H8 = 0.1; O2 = 0.9" Parameters="C3H8=0.1" />
+      <Add TPX="T = 298.15; P = 1.0e+5; C3H8 = 0.1; O2 = 0.9" Parameters="C3H8=0.2" />
+      <Add TPX="T = 298.15; P = 1.0e+5; C3H8 = 0.1; O2 = 0.9" Parameters="C3H8=0.3" />
+    </Projections>
+  </Add>  
+  <Add>
+    <Description>
+
+    </Description>
+    <Script>
+      Fuel = 0.1
+      Air = ?
+      Fuel:{
+        C3H8 = 0.5
+        AR = ?
+      }
+      Air:{
+        O2 = 0.21
+        N2 = ?
+      }
+    </Script>
+    <Projections>
+      <Add TPX="T = 298.15; P = 1.0e+5; C3H8 = 0.1; O2 = 0.9" />
+    </Projections>
+  </Add>
+
+  <Add>
+    <Description>
+
+    </Description>
+    <Script>
+      Fuel = ?
+      Air = ?
+      
+      "mixture fraction" = {
+        min = 0.1
+        max = 1.0
+        increment = 3%
+      }
+      
+      $temperature = {
+        min = 300.0
+        max = 1000.0
+        increment = 100.0
+      }
+      
+      
+      def(Fuel) = {
+        C3H8 = 0.5
+        AR = ?
+      }
+      def(Air) = {
+        O2 = 0.21
+        N2 = ?
+      }
+    </Script>
+    <Projections>
+      <Add TPX="T = 298.15; P = 1.0e+5; C3H8 = 0.1; O2 = 0.9" />
+    </Projections>
+  </Add>
+</SingleRootTestCases>

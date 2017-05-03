@@ -102,6 +102,17 @@
             }
         }
 
+        public T[] ToArray()
+        {
+            var clone = new T[m_array.Length];
+            for (int i = 0; i < clone.Length; ++i)
+            {
+                clone[i] = m_array[i];
+            }
+
+            return clone;
+        }
+
 
         #region IEnumerable<T> Members
 

@@ -119,6 +119,38 @@ namespace Nature
 		}
 		<# } #> 
 	}	
+
+	public partial struct ReadOnlyIdealGasState
+	{
+		internal readonly IdealGasState _innerState;
+
+		public ReadOnlyIdealGasState(IdealGasState state) : this()
+		{
+			_innerState = state;
+		}
+
+		<# foreach(var scalar in igs.Scalars){ #> 
+		/// <summary>
+        /// 
+        /// </summary>
+		public double <#= scalar.Name #> 
+		{ 
+			[DebuggerStepThrough]
+			get { return _innerState.<#= scalar.Name #>; }
+		} <# } #>
+
+		<# foreach(var array in igs.Arrays){ #>  
+		/// <summary>
+        /// 
+        /// </summary>
+		public ReadOnlyArray<double> <#= array.Name #> 
+		{ 
+			[DebuggerStepThrough]
+			get { return _innerState.<#= array.Name #>; }
+		} <# } #>
+
+		public static implicit operator ReadOnlyIdealGasState(IdealGasState state) => new ReadOnlyIdealGasState(state);
+	}
 }
 	<#+ 
 

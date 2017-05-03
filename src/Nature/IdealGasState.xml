@@ -1,13 +1,20 @@
-﻿<IdealGasState  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="IdealGasState.xsd">
+﻿<IdealGasState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="IdealGasState.xsd">
   <Scalars>
-    <Add Name="Temperature" DependencyType="Complex" />
-    <Add Name="Pressure" DependencyType="Complex" />
-    <Add Name="MolarMass" DependencyType="Composition" />
-    <Add Name="MolarDensity" DependencyType="Complex" />
-    <Add Name="MassDensity" DependencyType="Complex" />
+    <Add Name="Temperature" />
+    <Add Name="Pressure" />
+    <Add Name="MolarMass"/>
+    <Add Name="MolarDensity" />
+    <Add Name="MassDensity" />
+    <Add Name="ReducedCp" />
+    <Add Name="ReducedS" />
+    <Add Name="SpeedOfSound" />
   </Scalars>
   <Arrays>
-    <Add Length="NumberOfSpecies" Name="SpeciesMassFractions" DependencyType="Composition"  />
-    <Add Length="NumberOfSpecies" Name="SpeciesMoleFractions" DependencyType="Composition"  />
+    <Add Length="NumberOfSpecies" Name="SpeciesMassFractions" Dependency="X"  />
+    <Add Length="NumberOfSpecies" Name="SpeciesMoleFractions" Dependency="X"  />
+    <Add Length="NumberOfSpecies" Name="SpeciesReducedCp" Dependency="T" />
+    <Add Length="NumberOfSpecies" Name="SpeciesReducedH" Dependency="T" />
+    <Add Length="NumberOfSpecies" Name="SpeciesReducedS" Dependency="T" />
+    <Add Length="NumberOfSpecies" Name="SpeciesLogX" Dependency="X" />
   </Arrays>
 </IdealGasState>

@@ -1,22 +1,65 @@
 ﻿
 namespace Nature
 {
+    using Nature.GMix;
     using System;
     using System.Diagnostics;
+    using System.Linq;
 
     public sealed partial class IdealGasState
     {
-        readonly IdealGasModel _model;    
-        
+        readonly IdealGasModel _model;
+
+        public IdealGasModel Model => _model;
 
         public IdealGasState(IdealGasModel model)
         {
             if (ReferenceEquals(model, null))
                 throw new ArgumentNullException(nameof(model));
             _model = model;            
-            _speciesMoleFractions = new double[model.NumberOfSpecies];
+            _speciesMoleFractions = _model.AllocateSpeciesArray();
             _speciesMoleFractions[0] = 1.0;
             SetTPX(Constants.StandardStateTemperature, Constants.Atmosphere, _speciesMoleFractions);
+        }
+
+        public IdealGasState(IdealGasModel model, ReadOnlyIdealGasState other)
+        {
+            _model = model;
+            Set(other);
+        }
+
+        public IdealGasState(IdealGasModel model, string mixtureDefinition)
+        {
+            mixtureDefinition = mixtureDefinition.Trim();
+            if (model.IsSpeciesCode(mixtureDefinition))
+            {
+                string speciesCode = mixtureDefinition;
+                _speciesMoleFractions = model.AllocateSpeciesArray();
+                model.SetSpecies(speciesCode, _speciesMoleFractions, 1.0);
+                SetTPX(Constants.StandardStateTemperature, Constants.Atmosphere, _speciesMoleFractions);
+            }
+            else
+            {
+                //var gmixOutput = GMixMarkup.ParseAsync(mixtureDefinition, model).GetAwaiter().GetResult();
+                //var collection = gmixOutput.Single();
+                //var mixture = collection.Single();
+                //this.Set(mixture.IdealGasState);
+            }
+        }
+
+        [DebuggerNonUserCode]
+        public double SpeciesMoleFraction(string speciesCode) => _model.GetSpecies(speciesCode, SpeciesMoleFractions);
+
+        public void Set(ReadOnlyIdealGasState other)
+        {
+            if (ReferenceEquals(Model, other.Model))
+            {
+                SetTPX(other.Temperature, other.Pressure, other.SpeciesMoleFractions);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public void SetTPX(double temperature, double pressure, ReadOnlyArray<double> speciesMoleFractions)
@@ -56,7 +99,7 @@ namespace Nature
 
         private double CalculateMassDensity()
         {
-            throw new InvalidOperationException();
+            return MolarDensity * MolarMass;
         }
 
 
@@ -70,6 +113,31 @@ namespace Nature
             throw new NotImplementedException();
         }
 
+        [DebuggerStepThrough]
+        private void CalculateSpeciesReducedCp(double[] cp) => _model.CalculateSpeciesReducedCp(this.Temperature, cp);
+
+        [DebuggerStepThrough]
+        private void CalculateSpeciesReducedH(double[] h) => _model.CalculateSpeciesReducedH(this.Temperature, h);
+
+        [DebuggerStepThrough]
+        private void CalculateSpeciesReducedS(double[] s) => _model.CalculateSpeciesReducedS(this.Temperature, s);
+
+        private void CalculateSpeciesLogX(double[] logX)
+        {
+            var x = SpeciesMoleFractions;
+            for (int i = 0; i < logX.Length; ++i)
+            {
+                logX[i] = Math.Log(double.Epsilon + x[i]);
+            }
+        }
+
+
+        private double CalculateSpeedOfSound()
+        {
+            double cp = ReducedCp;
+            double gamma = cp / (cp - 1.0d);
+            return Math.Sqrt(gamma * Constants.Rgas * this.Temperature / this.MolarMass);
+        }
 
         private double CalculateMolarMass()
         {
@@ -86,6 +154,44 @@ namespace Nature
                 throw new InvalidOperationException();
            
             return _molarMass;
+        }
+
+        private double CalculateReducedCp()
+        {
+            var x = SpeciesMoleFractions;
+            var cp = SpeciesReducedCp;
+            double reducedCp = 0.0;
+            for (int i = 0; i < x.Length; ++i)
+            {
+                reducedCp += x[i] * cp[i];
+            }
+            return reducedCp;
+        }
+
+
+        private double CalculateReducedH()
+        {
+            var x = SpeciesMoleFractions;
+            var h = SpeciesReducedH;
+            double reducedH = 0.0;
+            for (int i = 0; i < x.Length; ++i)
+            {
+                reducedH += x[i] * h[i];
+            }
+            return reducedH;
+        }
+
+        private double CalculateReducedS()
+        {
+            var x = SpeciesMoleFractions;
+            var s = SpeciesReducedS;
+            var logX = SpeciesLogX;
+            double reducedS = 0.0;
+            for (int i = 0; i < x.Length; ++i)
+            {
+                reducedS += x[i] * (s[i] - logX[i]);
+            }
+            return reducedS;
         }
 
         private void CalculateSpeciesMassFractions(double[] y)

@@ -21,8 +21,7 @@ namespace Nature
             state.SetTPY(Constants.StandardStateTemperature, Constants.Atmosphere, y);
             double expectedMolarMass = state.MolarMass;
 
-            double[] x = model.AllocateSpeciesArray<double>();
-            state.SpeciesMoleFractions.CopyTo(ref x);
+            double[] x = state.SpeciesMoleFractions.ToArray();
             state.SetTPX(Constants.StandardStateTemperature, Constants.Atmosphere, x);
             double actualMolarMass = state.MolarMass;
 
@@ -30,6 +29,18 @@ namespace Nature
             Assert.Equal(expectedMolarMass, actualMolarMass, comparer);        
             Assert.True(comparer.Equals(y, state.SpeciesMassFractions));
 
+            x = model.AllocateSpeciesArray<double>();
+            model.SetSpecies("N2", x, 1.0);
+            state.SetTPX(Constants.StandardStateTemperature, Constants.Atmosphere, x);
+            var cp = state.ReducedCp;            
+            var c = state.SpeedOfSound;
+
+
+            for (double t = Constants.StandardStateTemperature; t < 1000; t *= 1.1)
+            {
+                state.SetTPX(t, Constants.Atmosphere, x);
+                double z = state.SpeedOfSound;
+            }
         }
     }
 }

@@ -1,0 +1,128 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension="generated.cs" #>
+
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="Microsoft.CSharp" #>
+
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Configuration" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Xml.Serialization" #>
+<#@ import namespace="System.Diagnostics" #>
+<#
+	var lhsTypes = new Descriptor[]{
+		new Descriptor("Temperature", "t(?:emp(?:er(?:ature)?)?)?"),
+		new Descriptor("Pressure", "p(?:res(?:sure)?)?"),
+		new Descriptor("EquivalenceRatio", @"eq(?:\.?|uivalence)?\b\s*[-_]?\s*ratio")
+	};
+
+	string pureSpeciesComponent = Descriptor.GetClassName("PureSpeciesComponent");
+	string complexComponent = Descriptor.GetClassName("ComplexComponent");
+	string complexComponentDefinition = Descriptor.GetClassName("ComplexComponentDefinition");
+	var classes = new List<string>(){ 
+		pureSpeciesComponent,
+		complexComponent,
+		complexComponentDefinition
+	};
+	classes.AddRange(lhsTypes.Select(c=> c.Class));
+	
+    		
+ #>
+namespace Nature.GMix
+{
+	using System;
+	using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Text.RegularExpressions;
+
+	
+
+	abstract class LeftHandSiteConverter
+	{
+		readonly string _prefix;<# foreach(var lhs in lhsTypes){#> 
+		readonly Regex <#= lhs.Field #> = new Regex(@"<#= lhs.Pattern #>"); <# } #> 
+
+		public LeftHandSiteConverter(string prefix = "$")
+		{
+			_prefix = prefix;
+		}
+
+		protected abstract bool IsSpeciesCode(string expression);
+
+		public object Convert(string expression)
+		{
+			expression = expression.Trim();
+			if(!expression.StartsWith(_prefix))
+			{
+				return IsSpeciesCode(expression)
+					? (LeftHandSide)new <#= pureSpeciesComponent #>(expression)
+					: (LeftHandSide)new ComplexComponentLeftHandSide(expression);
+			}
+
+			expression = expression.Substring(_prefix.Length);
+			expression = Regex.Replace(expression, @"^\s*[(]\s*|\s*[)]\s*$", string.Empty).Trim();
+			<# foreach(var lhs in lhsTypes){  #> 
+			if(<#= lhs.Field #>.IsMatch(expression) )return new <#= lhs.Class #>(expression); <# } #> 
+			return new ComplexComponentDefinitionLeftHandSide(expression);			
+		}
+
+		sealed class DefaultConverter : LeftHandSiteConverter
+		{
+			readonly IdealGasModel _model;
+			public DefaultConverter(IdealGasModel model)
+			{
+				_model = model;
+			}
+
+			protected override bool IsSpeciesCode(string code) => _model.IsSpeciesCode(code);
+		}
+
+		public static LeftHandSiteConverter FromIdealGasModel(IdealGasModel model) => new DefaultConverter(model);
+	}
+
+	abstract class LeftHandSide
+	{
+		public string Tag { get; }
+
+		protected LeftHandSide(string tag) 
+		{
+			Tag = tag;
+		}		
+	}
+
+	<# foreach(var c in classes){ #> 
+	sealed class <#= c #> : LeftHandSide
+	{
+		public <#= c #>(string tag) : base(tag) {}
+	}
+	<# } #> 
+
+}
+<#+
+	class Descriptor
+	{
+		public Descriptor(string name, string pattern)
+		{
+			Name = name;
+			Pattern = @"^@tag$".Replace("@tag", pattern);
+			Pattern = Regex.Replace(Pattern, @"\s+", "");
+			Field = Regex.Replace(Name, @"^.", m=> "_" + m.Value.ToLower());	
+			Class = GetClassName(Name);
+		}
+
+		public string Name { get; private set; }
+		public string Pattern { get; private set; }
+		public string Field { get; private set; }
+		public string Class { get; private set; }
+		public static string GetClassName(string name)
+		{
+			return name + "LeftHandSide";
+		}
+	}
+#>

@@ -16,6 +16,8 @@
         readonly double[] _speciesMolarMasses;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         readonly IReadOnlyDictionary<string, int> _ixSpeciesOrdynalByCode;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        readonly ISpeciesThermodynamicFunctions[] _speciesThermodynamicFunctions;
 
         public IdealGasModel(IEnumerable<object> objectHeap)
         {
@@ -58,6 +60,16 @@
                 }
             }
 
+            _speciesThermodynamicFunctions = new ISpeciesThermodynamicFunctions[_numberOfSpecies];
+            {
+                var lookup = objectHeap.OfType<ISpeciesThermodynamicFunctions>().ToDictionary(i => i.SpeciesCode, StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < _numberOfSpecies; ++i)
+                {
+                    var speciesCode = _speciesCodes[i];
+                    _speciesThermodynamicFunctions[i] = lookup[speciesCode];
+                }
+            }
+
         }
 
         public int NumberOfSpecies => this._numberOfSpecies;
@@ -71,7 +83,33 @@
         public bool IsSpeciesCode(string speciesCode) => _ixSpeciesOrdynalByCode.ContainsKey(speciesCode);
 
 
+        public void CalculateSpeciesReducedCp(double temperature, double[] speciesRedicedCp)
+        {
+            for (int i = 0; i < speciesRedicedCp.Length; ++i)
+            {
+                speciesRedicedCp[i] = _speciesThermodynamicFunctions[i].ReducedCp(temperature);
+            }
+        }
+
+        public void CalculateSpeciesReducedH(double temperature, double[] speciesRedicedH)
+        {
+            for (int i = 0; i < speciesRedicedH.Length; ++i)
+            {
+                speciesRedicedH[i] = _speciesThermodynamicFunctions[i].ReducedH(temperature);
+            }
+        }
+
+        public void CalculateSpeciesReducedS(double temperature, double[] speciesRedicedS)
+        {
+            for (int i = 0; i < speciesRedicedS.Length; ++i)
+            {
+                speciesRedicedS[i] = _speciesThermodynamicFunctions[i].ReducedS(temperature);
+            }
+        }
+
         public T[] AllocateSpeciesArray<T>() => new T[NumberOfSpecies];
+
+        public double[] AllocateSpeciesArray() => new double[NumberOfSpecies];
 
         public void SetSpecies<T>(string speciesCode, T[] array, T value)
         {

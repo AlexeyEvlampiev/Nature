@@ -1,5 +1,6 @@
 ﻿namespace Nature
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Text.RegularExpressions;
@@ -32,5 +33,20 @@
             return true;
         }
 
+
+        internal static T GetOrCreate<T>(this IDictionary<string, object> self, string key, Func<T> factory)
+        {
+            if (ReferenceEquals(self, null))
+                return factory();
+
+            object value = null;
+            if (self.TryGetValue(key, out value) && value is T)
+            {
+                return (T)value;
+            }
+
+            self[key] = value = factory();
+            return (T)value;
+        }
     }
 }

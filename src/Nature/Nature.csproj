@@ -24,6 +24,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Constants.tt</DependentUpon>
     </Compile>
+    <Compile Update="GMix\LeftHandSide.generated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LeftHandSide.tt</DependentUpon>
+    </Compile>
     <Compile Update="IdealGasState.generated.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -43,6 +48,10 @@
     <None Update="Constants.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Constants.generated.cs</LastGenOutput>
+    </None>
+    <None Update="GMix\LeftHandSide.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LeftHandSide.generated.cs</LastGenOutput>
     </None>
     <None Update="IdealGasState.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
