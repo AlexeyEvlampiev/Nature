@@ -2,6 +2,7 @@
 {
     using System;
     using System.Text.RegularExpressions;
+    using Text;
 
     public abstract class ChemkinException : Exception
     {

@@ -1,6 +1,6 @@
-﻿namespace Nature
+﻿namespace Nature.Text
 {
-    struct TextPosition
+    public struct TextPosition
     {
         public TextPosition(int line, int column) : this() { this.Line = line; this.Column = column; }
         public readonly int Line;

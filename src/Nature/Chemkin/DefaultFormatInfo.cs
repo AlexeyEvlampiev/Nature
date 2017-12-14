@@ -5,6 +5,8 @@
     using System.Globalization;
     using System.Text.RegularExpressions;
     using Nature.Common;
+    using Text.RegularExpressions;
+
     public class DefaultFormatInfo : IFormatInfo
     {
         private readonly Regex m_elementIdRegex;

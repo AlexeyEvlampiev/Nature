@@ -6,6 +6,8 @@
     using System.Text.RegularExpressions;
     using System;
     using System.Collections.Generic;
+    using Text;
+    using Text.RegularExpressions;
 
     public sealed class NasaA7 : NasaA7Base
     {
@@ -68,17 +70,19 @@
 
         public static NasaA7 Parse(
             string text,
-            INasaA7DeserializationContext context = null)
+            DeserializationContext context = null)
         {
-            ChemkinMarkup markup = new ChemkinMarkup(text);
-            context = context ?? new DefaultDeserializationContext();
-            return Parse(markup, context, null);
+            //ChemkinMarkup markup = new ChemkinMarkup(text);
+            //context = context ?? new DefaultDeserializationContext();
+            //return Parse(markup, context, null);
+            throw new NotImplementedException();
         }
 
         internal static NasaA7 Parse(
-            ChemkinMarkup markup,
-            INasaA7DeserializationContext context,
-            Capture capture)
+            ChemkinMarkup markup,            
+            Capture capture,
+            DeserializationContext context,
+            IDeserializationDiagnosticsCallback diagnosticsCallback)
         {
             int index = 0;
             int length = markup.AdaptedText.Length;
@@ -88,15 +92,17 @@
                 length = capture.Length;
             }
 
-            var session = context.GetSession();
-            var options = context.GetOptions();
-            var diagnosticsCallback = context.GetDiagnosticsCallback();
-            var formatInfo = context.GetFormatInfo();
-            var messageBuilder = context.GetMessageBuilder();
-            var validator = context.GetSpeciesThermodynamicFunctionsValidator();
+            var options = context.GetOrCreate<INasaA7HeaderFormatOptions>(()=> new NasaA7HeaderFormatOptions());            
+            var formatInfo = context.GetOrCreate<IFormatInfo>(()=> new DefaultFormatInfo());
+            var messageBuilder = context.GetOrCreate<INasaA7DiagnosticsMessageBuilder>(()=> new DefaultMessageBuilder());
+            var validator =
+                context.GetOrCreate<ISpeciesThermodynamicFunctionsValidator>(() =>
+                    new DefaultSpeciesThermodynamicFunctionsValidator());
+            var collectionContext =
+                context.GetOrCreate<IThermoCollectionContext>(() => new DefaultThermoCollectionContext());
 
             string urlParams = NasaA7HeaderFormatOptions.BuildUrlParams(options);
-            var regex = session.GetOrCreate<Regex>($"nasa-a7-classic/regex?{urlParams}", 
+            var regex = context.GetOrCreate<Regex>($"nasa-a7-classic/regex?{urlParams}", 
                 ()=> 
                 {
                     int width = options.SpeciesIdWidth +
@@ -121,12 +127,12 @@
 
             var headerCapture = match.Groups["header"];
             var coefCaptures = match.Groups["a"].Captures;
-            var header = NasaA7Header.Parse(markup, context, headerCapture);
+            var header = NasaA7Header.Parse(markup, headerCapture, context, diagnosticsCallback);
 
 
-            double? lowTemperature = header.LowTemperature ?? context.DefaultLowTemperature;
-            double? highTemperature = header.HighTemperature ?? context.DefaultHighTemperature;
-            double? commonTemperature = header.CommonTemperature ?? context.DefaultCommonTemperature;
+            double? lowTemperature = header.LowTemperature ?? collectionContext.DefaultLowTemperature;
+            double? highTemperature = header.HighTemperature ?? collectionContext.DefaultHighTemperature;
+            double? commonTemperature = header.CommonTemperature ?? collectionContext.DefaultCommonTemperature;
 
             var exceptions = new ChemkinExceptionCollection();
             exceptions.TryCatch(()=> {

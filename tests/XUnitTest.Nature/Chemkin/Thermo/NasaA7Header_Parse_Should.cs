@@ -5,6 +5,7 @@
     using System;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using Text;
     using Xunit;
 
     public class NasaA7Header_Parse_Should
@@ -42,7 +43,7 @@
             string header = Regex.Replace(NasaA7HeaderResource.CH3CHO, "^.{18}", m => new string((char)32, m.Length));
             string expectedStatement = Guid.NewGuid().ToString();
             
-            var context = new DefaultDeserializationContext();
+            var context = new DeserializationContext();
             var messageBuilder = new Mock<INasaA7DiagnosticsMessageBuilder>();
             messageBuilder.Setup(m => m.SpeciesCodeIsMissing()).Returns(expectedStatement);
             context.Push(messageBuilder.Object);
@@ -58,7 +59,7 @@
             string header = Regex.Replace(NasaA7HeaderResource.CH3CHO, "(?<=^.{24}).{20}", m => new string((char)32, m.Length));
             string expectedStatement = Guid.NewGuid().ToString();
 
-            var context = new DefaultDeserializationContext();
+            var context = new DeserializationContext();
             var messageBuilder = new Mock<INasaA7DiagnosticsMessageBuilder>();
             messageBuilder.Setup(m => m.MissingChemicalFormula("CH3CHO")).Returns(expectedStatement);
             context.Push(messageBuilder.Object);
@@ -74,7 +75,7 @@
             string header = Regex.Replace(NasaA7HeaderResource.CH3CHO, "(?<=^.{44}).", "Z");
             string expectedStatement = Guid.NewGuid().ToString();
 
-            var context = new DefaultDeserializationContext();
+            var context = new DeserializationContext();
             var messageBuilder = new Mock<INasaA7DiagnosticsMessageBuilder>();
             messageBuilder.Setup(m => m.InvalidPhaseIdentifier("CH3CHO", "Z")).Returns(expectedStatement);
             context.Push(messageBuilder.Object);

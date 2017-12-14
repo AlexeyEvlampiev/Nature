@@ -1,8 +1,7 @@
-﻿using System;
-using System.Text.RegularExpressions;
-
-namespace Nature
+﻿namespace Nature.Text.RegularExpressions
 {
+    using System.Text.RegularExpressions;
+
     static class RegexUtils
     {
         internal static string Minify(string pattern)

@@ -8,6 +8,8 @@
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
+    using Text;
+    using Text.RegularExpressions;
 
     public sealed class NasaA7Header : IChemicalFormula
     {        
@@ -30,19 +32,20 @@
 
         public double this[string elementCode] => GetElementContent(elementCode);
 
-        public static NasaA7Header Parse(string text, INasaA7HeaderDeserializationContext context = null)
+        public static NasaA7Header Parse(string text, DeserializationContext context = null)
         {
             if (ReferenceEquals(text, null))
                 throw new ArgumentNullException(nameof(text));
             var markup = new ChemkinMarkup(text);
-            context = context ?? new DefaultDeserializationContext();
-            return Parse(markup, context);
+            context = context ?? new DeserializationContext();
+            return Parse(markup, null, context, new DebugDiagnosticsCallback());
         }
 
         internal static NasaA7Header Parse(
-            ChemkinMarkup markup,
-            INasaA7HeaderDeserializationContext context,
-            Capture capture = null)
+            ChemkinMarkup markup,            
+            Capture capture,
+            DeserializationContext context,
+            IDeserializationDiagnosticsCallback diagnosticsCallback)
         {
             if (ReferenceEquals(markup, null))
                 throw new ArgumentNullException(nameof(markup));
@@ -58,15 +61,14 @@
                 length = capture.Length;
             }
 
-            var session = context.GetSession();
-            var options = context.GetOptions();
-            var diagnosticsCallback = context.GetDiagnosticsCallback();
-            var formatInfo = context.GetFormatInfo();
-            var messageBuilder = context.GetMessageBuilder();            
+            var options = context.GetOrCreate<INasaA7HeaderFormatOptions>(()=> new NasaA7HeaderFormatOptions());
+            var formatInfo = context.GetOrCreate<IFormatInfo>(()=> new DefaultFormatInfo());
+            var messageBuilder = context.GetOrCreate<INasaA7DiagnosticsMessageBuilder>(()=> new DefaultMessageBuilder());
+            var collectionContext = context.GetOrCreate<IThermoCollectionContext>(()=> new DefaultThermoCollectionContext());
 
             string urlParams = NasaA7HeaderFormatOptions.BuildUrlParams(options);
             string sessionKey = $"chemical-formula/regex?{urlParams}";
-            Regex r = session.GetOrCreate<Regex>(sessionKey, () => {
+            Regex r = context.GetOrCreate<Regex>(sessionKey, () => {
                 var pattern = $@"
                     (?<code>.{{{options.SpeciesIdWidth}}})
                     (?<date>.{{{options.DateWidth}}})
@@ -95,7 +97,7 @@
 
             var exceptions = new ChemkinExceptionCollection();
             var speciesCodeAreaGroup = match.Groups["code"];
-            var speciesCodeRegex = session.GetOrCreate<Regex>("nasa-a7/header/slement-name/regex",()=> 
+            var speciesCodeRegex = context.GetOrCreate<Regex>("nasa-a7/header/slement-name/regex",()=> 
                 new Regex(RegexUtils.Minify(@"(?<code>\S+)\s*(?<defect>\S.*\S)?")));
             var speciesCodeMatch = speciesCodeRegex.Match(markup.AdaptedText, speciesCodeAreaGroup);
             exceptions.TryCatch(()=> {
@@ -137,12 +139,12 @@
             
             
             sessionKey = $"chemical-formula/regex/element?{urlParams}";
-            r = session.GetOrCreate<Regex>(sessionKey, () => {
+            r = context.GetOrCreate<Regex>(sessionKey, () => {
                 var pattern = $@"(?<code>.{{2}})(?<content>.{{{options.ElementWidth - 2}}})";
                 pattern = RegexUtils.Minify(pattern);
                 return new Regex(pattern);
             });
-            var emptyElementRegex = session.GetOrCreate<Regex>("chemical-formula/empty-element/regex", ()=> new Regex(@"^[0\s]+$"));
+            var emptyElementRegex = context.GetOrCreate<Regex>("chemical-formula/empty-element/regex", ()=> new Regex(@"^[0\s]+$"));
             var elementCaptures = classicChemicalFormulaGroup.Captures;
             for (int i = 0; i < elementCaptures.Count; ++i)
             {
@@ -184,7 +186,7 @@
             }
             else
             {
-                header.LowTemperature = context.DefaultLowTemperature;
+                header.LowTemperature = collectionContext.DefaultLowTemperature;
             }
 
             if (!string.IsNullOrWhiteSpace(match.Groups["tmax"].Value))
@@ -193,7 +195,7 @@
             }
             else
             {
-                header.HighTemperature = context.DefaultHighTemperature;
+                header.HighTemperature = collectionContext.DefaultHighTemperature;
             }
 
             if (!string.IsNullOrWhiteSpace(match.Groups["tcom"].Value))
@@ -202,14 +204,14 @@
             }
             else
             {
-                header.CommonTemperature = context.DefaultCommonTemperature;
+                header.CommonTemperature = collectionContext.DefaultCommonTemperature;
             }
 
 
             if (match.Groups["formula"].Success)
             {
                 var group = match.Groups["formula"];
-                var formulaRegex = session.GetOrCreate<Regex>("chemical-formula/extras/regex", () => 
+                var formulaRegex = context.GetOrCreate<Regex>("chemical-formula/extras/regex", () => 
                 {
                     string pattern = @"
                         (?>
