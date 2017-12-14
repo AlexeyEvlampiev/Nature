@@ -2,7 +2,6 @@
 {
     using Nature.Common;
     using System.Collections.Generic;
-    using System;
 
     public abstract class NasaA7Base : IChemicalFormula, ISpeciesThermodynamicFunctions
     {

@@ -1,6 +1,6 @@
 ﻿namespace Nature.Chemkin
 {
-    using System.IO;
+    using System.Linq;
     using Thermo;
     using Xunit;
 
@@ -11,6 +11,7 @@
         {
             var text = ThermoCollectionsResource.thermo30;
             var module = ChemkinModule.Parse(text);
+            Assert.Equal(53, module.Count());
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿
 namespace Nature
 {
-    using Nature.GMix;
     using System;
     using System.Diagnostics;
-    using System.Linq;
 
     public sealed partial class IdealGasState
     {

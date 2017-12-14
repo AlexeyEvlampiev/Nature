@@ -1,8 +1,6 @@
 ﻿namespace Nature.GMix
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Xunit;
@@ -44,7 +42,7 @@
             foreach (var pair in testCases)
             {
                 //string script = pair.Key;
-                //string expectedMixtureName = pair.Value;
+                //string expectedMixtureName = pair.Result;
                 //var output = await GMixMarkup.ParseAsync(script, _model);
                 //var collections = output.Single();
                 //var mixture = collections.Single();

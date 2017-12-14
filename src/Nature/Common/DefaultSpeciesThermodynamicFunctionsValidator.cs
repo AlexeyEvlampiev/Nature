@@ -1,7 +1,6 @@
 ﻿namespace Nature.Common
 {
     using System;
-    using System.Diagnostics;
 
     public class DefaultSpeciesThermodynamicFunctionsValidator : ISpeciesThermodynamicFunctionsValidator
     {

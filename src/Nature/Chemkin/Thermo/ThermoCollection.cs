@@ -12,7 +12,8 @@
 
 
     public sealed class ThermoCollection : IThermoCollectionContext, IReadOnlyList<object>
-    {
+    {        
+
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         readonly List<object> _items = new List<object>();
 

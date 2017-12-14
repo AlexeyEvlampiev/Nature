@@ -1,8 +1,6 @@
 ﻿namespace Nature.Chemkin.Thermo
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
 
     public class NasaA7HeaderFormatOptions : INasaA7HeaderFormatOptions
     {

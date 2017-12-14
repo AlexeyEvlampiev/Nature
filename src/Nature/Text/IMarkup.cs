@@ -1,7 +1,5 @@
 ﻿namespace Nature.Text
 {
-    using System.Collections.Generic;
-
     public interface IMarkup
     {        
         string Id { get; }

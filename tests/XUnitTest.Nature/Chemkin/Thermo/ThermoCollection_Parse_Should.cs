@@ -1,8 +1,5 @@
 ﻿namespace Nature.Chemkin.Thermo
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
     using Xunit;
 
     public class ThermoCollection_Parse_Should

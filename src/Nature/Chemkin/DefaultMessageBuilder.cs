@@ -18,7 +18,7 @@
 
         public string SpeciesCodeIsMissing() => "Species code is missing";
 
-        public string UnexpectedInputInSpeciesCodeArea(string defect) => $"Unexpected additional input in the species code field. Value: '{defect}'";
+        public string UnexpectedInputInSpeciesCodeArea(string defect) => $"Unexpected additional input in the species code field. Result: '{defect}'";
 
         public string MissingLowTemperature() => "The low temperature value could not be determined";
 
